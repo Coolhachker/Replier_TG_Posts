@@ -74,5 +74,9 @@ class MongoDBClient:
         self.delete_data_from_entry_in_collection_for_parser_configs(direction, channel)
         self.add_data_in_entry(self.collection_for_parser_configs, direction, data)
 
+    def get_channels_url(self, direction: str):
+        entry = self.get_entry(self.collection_for_parser_configs)
+        data_from_db = entry[direction]
+        return [obj.keys() for obj in data_from_db]
 
 
