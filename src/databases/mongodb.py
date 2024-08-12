@@ -80,4 +80,4 @@ class MongoDBClient:
         return [obj.keys() for obj in data_from_db]
 
 
-client_mongodb = MongoClient()
+client_mongodb = MongoDBClient()
