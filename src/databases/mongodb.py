@@ -41,6 +41,8 @@ class MongoDBClient:
             'uniq_key': self.uniq_key,
             'from': [],
             'to': [],
+            'stop_words': ['👇👇👇', '👇', 'Подробности', 'НОВОСТИ С ФРОНТА', 'СВО', 'теперь в Telegram', 'Жуткая статистика', 'переплачиваете',
+                           'Хватит переплачивать', '@', 'Читать далее', 'Фулл', 'Видео без цензуры', 'Прямая трансляция']
         }
 
         if self.collection_for_parser_configs.find_one({'uniq_key': self.uniq_key}) is None:
@@ -77,7 +79,13 @@ class MongoDBClient:
     def get_channels_url(self, direction: str):
         entry = self.get_entry(self.collection_for_parser_configs)
         data_from_db = entry[direction]
-        return [obj.keys() for obj in data_from_db]
+        return [obj.keys() for obj in data_from_db] if len(data_from_db) != 0 else []
+
+    def get_emoji(self, channel_url: str):
+        data_from_db = self.get_entry(self.collection_for_parser_configs)['to']
+        for element in data_from_db:
+            if element.keys() == channel_url:
+                return element['emoji']
 
 
 client_mongodb = MongoDBClient()
