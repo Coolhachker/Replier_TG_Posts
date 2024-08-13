@@ -98,13 +98,3 @@ class MongoDBClient:
 
 
 client_mongodb = MongoDBClient()
-client_mongodb.register_entry_channels_config()
-client_mongodb.update_data_in_entity_in_collection_for_parser_configs('from', 'https://t.me/video_smeshnye', {
-            "https://t.me/video_smeshnye": {
-                "time_from": "2023-08-27",
-                "time_to": "2023-09-27",
-                "video_or_photo": "video",
-                "morning_post": "False"
-            }
-        })
-print(client_mongodb.get_entry(client_mongodb.collection_for_parser_configs))
