@@ -2,6 +2,7 @@ from src.databases.mongodb import client_mongodb
 from telethon.types import Message
 from telethon import TelegramClient
 import re
+from src.exceptions.castom_exceptions import Exceptions
 from typing import List
 
 
@@ -30,7 +31,7 @@ async def processing(client_session: TelegramClient, post: Message, photo_or_vid
 
         return dict_of_data
     else:
-        pass
+        raise Exceptions.ExceptionOnUnsuitablePost('пост либо рекламный/ либо не содержит медиа')
 
 
 def check_post_on_media(mime_type: str, type_of_media: str) -> bool:

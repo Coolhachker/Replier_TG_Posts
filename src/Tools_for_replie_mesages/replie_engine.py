@@ -12,10 +12,15 @@ class ReplierEngine:
         self.channels_from_get_the_posts = client_mongodb.get_channels_url('from')
         self.channels_to_posts_the_posts = client_mongodb.get_channels_url('to')
 
+    async def central_processing(self):
+        pass
+
+    async def central_processing_of_task(self, channel_to_post: str, channel_from_to_get_post: str):
+        pass
+
     async def send_post_in_channel(self, channel_to_post: str, data_for_post: dict) -> None:
         await self.client_session.send_message(channel_to_post, **data_for_post)
 
-    async def get_post_from_channel(self, channel_from_to_get_post: str, offset_date: Union[datetime, None] = None, reverse=False) -> Message:
+    async def get_post_from_channel(self, channel_from_to_get_post: str, offset_date: Union[datetime, None] = None, reverse: bool = False) -> Message:
         post = await self.client_session.get_messages(channel_from_to_get_post, offset_date=offset_date, reverse=reverse)
         return post
-
