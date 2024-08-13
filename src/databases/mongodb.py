@@ -63,7 +63,7 @@ class MongoDBClient:
     def get_entry(self, collection: Collection):
         return collection.find_one({'uniq_key': self.uniq_key})
 
-    def delete_data_from_entry_in_collection_for_parser_configs(self, direction: str, channel: str):
+    def delete_data_from_entry_in_collection_for_parser_configs(self, direction: str, channel: str) -> None:
         entry = self.get_entry(self.collection_for_parser_configs)
         data_from_db: list = entry[direction]
         channels_in_entity = [obj.keys() for obj in data_from_db]
@@ -72,20 +72,25 @@ class MongoDBClient:
         else:
             raise Exceptions.ExceptionOnUnFoundChannelInDb(f'Не найден канал: {channel} в записи с ключом: {direction}')
 
-    def update_data_in_entity_in_collection_for_parser_configs(self, direction: str, channel: str, data: dict):
+    def update_data_in_entity_in_collection_for_parser_configs(self, direction: str, channel: str, data: dict) -> None:
         self.delete_data_from_entry_in_collection_for_parser_configs(direction, channel)
         self.add_data_in_entry(self.collection_for_parser_configs, direction, data)
 
-    def get_channels_url(self, direction: str):
+    def get_channels_url(self, direction: str) -> list:
         entry = self.get_entry(self.collection_for_parser_configs)
         data_from_db = entry[direction]
         return [obj.keys() for obj in data_from_db] if len(data_from_db) != 0 else []
 
-    def get_emoji(self, channel_url: str):
+    def get_emoji(self, channel_url: str) -> str:
         data_from_db = self.get_entry(self.collection_for_parser_configs)['to']
         for element in data_from_db:
             if element.keys() == channel_url:
                 return element['emoji']
+
+    def get_config_of_channel_from_get_posts(self, channel: str) -> dict:
+        entry = self.get_entry(self.collection_for_parser_configs)['from']
+        index_channel = [obj.keys() for obj in entry].index(channel)
+        return entry[index_channel][channel]
 
 
 client_mongodb = MongoDBClient()
