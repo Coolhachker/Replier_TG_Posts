@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from src.exceptions.castom_exceptions import Exceptions
-
+from typing import Union
 # Образец коллекции "collection_for_parser_configs"
 # {
 #     "from": [
@@ -35,6 +35,7 @@ class MongoDBClient:
         self.uniq_key = 1234567890
         self.collection_for_parser_configs = self.client['replies_config_collection']['collection_for_parser_configs']
         self.collection_for_bot_configs = self.client['replies_config_collection']['collection_for_bot_configs']
+        self.collection_for_id_offsets = self.client['replies_config_collection']['collection_for_id_offsets']
 
     def register_entry_channels_config(self):
         data = {
@@ -51,21 +52,33 @@ class MongoDBClient:
         else:
             pass
 
-    def add_data_in_entry(self, collection: Collection, key: str, data: dict):
-        entry = self.get_entry(collection)
+    def register_entry_in_collection_for_id_offsets(self, task_name):
+        data = {
+            'task_name': task_name,
+            'id_offset': 0
+        }
+
+        if self.collection_for_id_offsets.find_one({'task_name': task_name}) is None:
+            self.collection_for_id_offsets.insert_one(data)
+        else:
+            pass
+
+    def add_data_in_entry(self, collection: Collection, key: str, data: dict, uniq_key: str, uniq_value: Union[str, int]):
+        entry = self.get_entry(collection, uniq_key, uniq_value)
         data_from_db = entry[key]
         if type(data_from_db) is list:
             data_from_db.append(data)
         else:
             data_from_db = data
 
-        collection.update_one({'uniq_key': self.uniq_key}, {'$set': {key: data_from_db}})
+        collection.update_one({uniq_key: uniq_value}, {'$set': {key: data_from_db}})
 
-    def get_entry(self, collection: Collection):
-        return collection.find_one({'uniq_key': self.uniq_key})
+    @staticmethod
+    def get_entry(collection: Collection, uniq_key: str, uniq_value: Union[str, int]):
+        return collection.find_one({uniq_key: uniq_value})
 
     def delete_data_from_entry_in_collection_for_parser_configs(self, direction: str, channel: str) -> None:
-        entry = self.get_entry(self.collection_for_parser_configs)
+        entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)
         data_from_db: list = entry[direction]
         channels_in_entity = [key for obj in data_from_db for key in obj.keys()]
         if channel in channels_in_entity:
@@ -77,25 +90,29 @@ class MongoDBClient:
     def update_data_in_entity_in_collection_for_parser_configs(self, direction: str, channel: str, data: dict) -> None:
         try:
             self.delete_data_from_entry_in_collection_for_parser_configs(direction, channel)
-            self.add_data_in_entry(self.collection_for_parser_configs, direction, data)
+            self.add_data_in_entry(self.collection_for_parser_configs, direction, data, 'uniq_key', self.uniq_key)
         except Exceptions.ExceptionOnUnFoundChannelInDb:
-            self.add_data_in_entry(self.collection_for_parser_configs, direction, data)
+            self.add_data_in_entry(self.collection_for_parser_configs, direction, data, 'uniq_key', self.uniq_key)
 
     def get_channels_url(self, direction: str) -> list:
-        entry = self.get_entry(self.collection_for_parser_configs)
+        entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)
         data_from_db = entry[direction]
         return [key for obj in data_from_db for key in obj.keys()] if len(data_from_db) != 0 else []
 
     def get_emoji(self, channel_url: str) -> str:
-        data_from_db = self.get_entry(self.collection_for_parser_configs)['to']
+        data_from_db = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)['to']
         for element in data_from_db:
             if next(iter(element.keys())) == channel_url:
                 return element['emoji']
 
     def get_config_of_channel_from_get_posts(self, channel: str) -> dict:
-        entry = self.get_entry(self.collection_for_parser_configs)['from']
+        entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)['from']
         index_channel = [key for obj in entry for key in obj.keys()].index(channel)
         return entry[index_channel][channel]
+
+    @staticmethod
+    def delete_entry(collection: Collection, uniq_key: str, uniq_value: Union[str, int]):
+        collection.delete_one({uniq_key: uniq_value})
 
 
 client_mongodb = MongoDBClient()
