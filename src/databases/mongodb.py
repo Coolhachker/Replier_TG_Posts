@@ -102,11 +102,10 @@ class MongoDBClient:
     def get_emoji(self, channel_url: str) -> str:
         data_from_db = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)['to']
         for element in data_from_db:
-            if next(iter(element.keys())) == channel_url:
-                return element['emoji']
+            return element[channel_url]['emoji']
 
-    def get_config_of_channel_from_get_posts(self, channel: str) -> dict:
-        entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)['from']
+    def get_config_of_channel(self, channel: str, direction: str) -> dict:
+        entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)[direction]
         index_channel = [key for obj in entry for key in obj.keys()].index(channel)
         return entry[index_channel][channel]
 
