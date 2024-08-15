@@ -4,9 +4,10 @@ from telethon import TelegramClient
 import re
 from src.exceptions.castom_exceptions import Exceptions
 from typing import List
+from typing import Union
 
 
-async def processing(client_session: TelegramClient, post: Message, photo_or_video: str, channel_to_post: str) -> dict:
+async def processing(client_session: TelegramClient, post: Message, photo_or_video: str, channel_to_post: str, emoji: str) -> dict:
     """
     Основной задачей функции является обработка постов перед их отправкой, а именно
     замена ссылок на новые ссылки, сохранение пути фото/видео, обнаружение спам сообщений
@@ -14,12 +15,12 @@ async def processing(client_session: TelegramClient, post: Message, photo_or_vid
     :param post: объект Message
     :param photo_or_video: 'photo' or 'video'
     :param channel_to_post: url ссылка на канал, куда отправлять сообщения
+    :param emoji:
     :return: словарь из данных
     """
     dict_of_data: dict = {}
     mime_type: str = post.media.document.mime_type.split('/')[0]
     message_text: str = post.message
-    emoji = client_mongodb.get_emoji(channel_to_post)
     if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text):
         entity_channel_to_post = await client_session.get_entity(channel_to_post)
         blob = await client_session.download_media(post, bytes)
@@ -50,3 +51,10 @@ def check_post_on_advert(message: str) -> bool:
         if re.search(word.lower(), message.lower()):
             return False
     return True
+
+
+def check_on_date(timestamp_of_post: int, lower_date_timestamp: int) -> Union[None, True]:
+    if timestamp_of_post < lower_date_timestamp:
+        pass
+    else:
+        return True

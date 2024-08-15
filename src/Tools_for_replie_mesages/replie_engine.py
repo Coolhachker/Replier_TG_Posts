@@ -45,12 +45,15 @@ class ReplierEngine:
         task_name = asyncio.current_task().get_name()
         while True:
             try:
+                data_from_configs_of_channels_from_get_posts = client_mongodb.get_config_of_channel(channel_from_to_get_post, 'from')
+                data_from_configs_of_channels_to_post_posts = client_mongodb.get_config_of_channel(channel_to_post, 'to')
+
                 id_offset = client_mongodb.get_entry(client_mongodb.collection_for_id_offsets, 'task_name', task_name)['id_offset']
                 post = await self.get_post_from_channel(channel_from_to_get_post, message_offset_id=id_offset)
                 #обновляю id_offset в mongodb
                 client_mongodb.add_data_in_entry(client_mongodb.collection_for_id_offsets, 'id_offset', post.id, 'task_name', task_name)
 
-                data_for_send_in_channels = await processing(self.client_session, post, 'video', channel_to_post)
+                data_for_send_in_channels = await processing(self.client_session, post, 'video', channel_to_post, )
 
                 logger.debug(post)
                 logger.debug(data_for_send_in_channels)
