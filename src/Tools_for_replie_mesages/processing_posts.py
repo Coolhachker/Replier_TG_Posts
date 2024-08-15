@@ -18,20 +18,23 @@ async def processing(client_session: TelegramClient, post: Message, photo_or_vid
     """
     dict_of_data: dict = {}
     mime_type: str = post.media.document.mime_type.split('/')[0]
-    message_text: str = post.message if len(post.message.split('\n')) != 0 else post.message + '\n'
-    # emoji = client_mongodb.get_emoji(channel_to_post)
+    message_text: str = post.message
+    emoji = client_mongodb.get_emoji(channel_to_post)
     if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text):
         entity_channel_to_post = await client_session.get_entity(channel_to_post)
-        path_document = await client_session.download_media(post)
-        message_text_split = message_text.split('\n')[-1]
-        message_text = message_text.replace(message_text_split, f'<a href="{channel_to_post}">{entity_channel_to_post.title}')
+        blob = await client_session.download_media(post, bytes)
+        file = await client_session.upload_file(blob)
+        file.name = mime_type + '.mp4' if photo_or_video == 'video' else mime_type + '.jpg'
+        message_text_split = message_text.split('\n')
+        message_text = message_text.replace(message_text_split[-1], f'<a href="{channel_to_post}">{entity_channel_to_post.title}{emoji}</a>') if len(message_text_split) > 1 else f'{message_text}\n<a href="{channel_to_post}">{entity_channel_to_post.title}{emoji}</a>'
 
-        dict_of_data['path_document'] = path_document
-        dict_of_data['message_text'] = message_text
+        dict_of_data['file'] = file
+        dict_of_data['message'] = message_text
+        dict_of_data['parse_mode'] = 'html'
 
         return dict_of_data
     else:
-        raise Exceptions.ExceptionOnUnsuitablePost('пост либо рекламный/ либо не содержит медиа')
+        raise Exceptions.ExceptionOnUnsuitablePost('пост либо рекламный / либо не содержит медиа')
 
 
 def check_post_on_media(mime_type: str, type_of_media: str) -> bool:
@@ -42,7 +45,7 @@ def check_post_on_media(mime_type: str, type_of_media: str) -> bool:
 
 
 def check_post_on_advert(message: str) -> bool:
-    stop_words: List[str] = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs)['stop_words']
+    stop_words: List[str] = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['stop_words']
     for word in stop_words:
         if re.search(word.lower(), message.lower()):
             return False
