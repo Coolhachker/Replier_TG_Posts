@@ -64,7 +64,7 @@ class ReplierEngine:
                 await check_post(post, self.client_session, channel_to_post)
 
                 #обработка поста
-                data_for_send_in_channels = await processing(self.client_session, post, 'video', channel_to_post, emoji, lower_datetime_limit)
+                data_for_send_in_channels = await processing(self.client_session, post, video_or_photo, channel_to_post, emoji, lower_datetime_limit)
 
                 logger.debug(data_for_send_in_channels)
                 await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)

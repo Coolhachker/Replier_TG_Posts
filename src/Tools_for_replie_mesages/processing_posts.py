@@ -1,3 +1,5 @@
+import datetime
+
 from src.databases.mongodb import client_mongodb
 from telethon.types import Message
 from telethon import TelegramClient
@@ -32,11 +34,12 @@ async def processing(
     message_text: str = post.message
     if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text) and check_on_date(post.date.timestamp(), lowe_limit_timestamp_in_config):
         entity_channel_to_post = await client_session.get_entity(channel_to_post)
+        title = entity_channel_to_post.title
         blob = await client_session.download_media(post, bytes)
         file = await client_session.upload_file(blob)
         file.name = mime_type + '.mp4' if photo_or_video == 'video' else mime_type + '.jpg'
         message_text_split = message_text.split('\n')
-        message_text = message_text.replace(message_text_split[-1], f'<a href="{channel_to_post}">{entity_channel_to_post.title}{emoji}</a>') if len(message_text_split) > 1 else f'{message_text}\n<a href="{channel_to_post}">{entity_channel_to_post.title}{emoji}</a>'
+        message_text = message_text_processing(message_text, channel_to_post, title, emoji, message_text_split)
 
         dict_of_data['file'] = file
         dict_of_data['message'] = message_text
@@ -68,3 +71,13 @@ def check_on_date(timestamp_of_post: Union[int, float], lower_date_timestamp: Un
         raise Exceptions.ExceptionOnDateOfPost('Пост вышел за рамки времени')
     else:
         return True
+
+
+def message_text_processing(message_text: str, channel_to_post: str, title: str, emoji: str, message_text_split: List[str]) -> str:
+    timestamp_of_now = datetime.datetime.now().timestamp()
+    timestamp_of_morning = datetime.datetime.timestamp(datetime.datetime(year=datetime.datetime.today().year, month=datetime.datetime.today().month, day=datetime.datetime.today().day, hour=9, minute=25, second=0))
+    if timestamp_of_now <= timestamp_of_morning:
+        return f'Доброе утро\n<a href="{channel_to_post}">{title}{emoji}</a>'
+    else:
+        return message_text.replace(message_text_split[-1], f'<a href="{channel_to_post}">{title}{emoji}</a>') if len(message_text_split) > 1 else f'{message_text}\n<a href="{channel_to_post}">{title}{emoji}</a>'
+

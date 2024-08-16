@@ -1,9 +1,6 @@
 import asyncio
-
 from telethon import TelegramClient
 from telethon.types import Message
-from telethon.types import InputMessagesFilterVideo
-from functools import lru_cache
 from typing import List, Union
 from src.exceptions.castom_exceptions import Exceptions
 
@@ -16,7 +13,6 @@ async def check_post(post: Message, client_session: TelegramClient, channel_to_p
         return True
 
 
-@lru_cache(maxsize=128)
 async def get_posts_from_channel_to_posts(channel: str, client_session: TelegramClient) -> List[bytes]:
     posts: List[bytes] = []
     for obj in await client_session.get_messages(channel, limit=50):
