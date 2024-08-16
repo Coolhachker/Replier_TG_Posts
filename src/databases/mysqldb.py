@@ -37,6 +37,7 @@ class MysqlDB:
         self.cursor.execute('SELECT * FROM trusted_users')
         if len(self.cursor.fetchall()) == 0:
             self.cursor.executemany("""INSERT INTO trusted_users(user_nickname) VALUES(%s)""", [('CHT_VENDETTA', )])
+        self.connection.commit()
 
 
 client_mysqldb = MysqlDB()
