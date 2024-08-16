@@ -3,6 +3,7 @@ from pymongo.collection import Collection
 from src.exceptions.castom_exceptions import Exceptions
 from typing import Union
 from functools import lru_cache
+from typing import Any
 # Образец коллекции "collection_for_parser_configs"
 # {
 #     "from": [
@@ -64,7 +65,7 @@ class MongoDBClient:
         else:
             pass
 
-    def add_data_in_entry(self, collection: Collection, key: str, data: dict, uniq_key: str, uniq_value: Union[str, int]):
+    def add_data_in_entry(self, collection: Collection, key: str, data: Any, uniq_key: str, uniq_value: Union[str, int]):
         entry = self.get_entry(collection, uniq_key, uniq_value)
         data_from_db = entry[key]
         if type(data_from_db) is list:
