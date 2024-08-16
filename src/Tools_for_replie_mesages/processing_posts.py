@@ -5,9 +5,17 @@ import re
 from src.exceptions.castom_exceptions import Exceptions
 from typing import List
 from typing import Union
+from functools import lru_cache
 
 
-async def processing(client_session: TelegramClient, post: Message, photo_or_video: str, channel_to_post: str, emoji: str) -> dict:
+async def processing(
+        client_session: TelegramClient,
+        post: Message,
+        photo_or_video: str,
+        channel_to_post: str,
+        emoji: str,
+        lowe_limit_timestamp_in_config: Union[int, float]
+) -> dict:
     """
     Основной задачей функции является обработка постов перед их отправкой, а именно
     замена ссылок на новые ссылки, сохранение пути фото/видео, обнаружение спам сообщений
@@ -16,12 +24,13 @@ async def processing(client_session: TelegramClient, post: Message, photo_or_vid
     :param photo_or_video: 'photo' or 'video'
     :param channel_to_post: url ссылка на канал, куда отправлять сообщения
     :param emoji:
+    :param lowe_limit_timestamp_in_config:
     :return: словарь из данных
     """
     dict_of_data: dict = {}
     mime_type: str = post.media.document.mime_type.split('/')[0]
     message_text: str = post.message
-    if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text):
+    if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text) and check_on_date(post.date.timestamp(), lowe_limit_timestamp_in_config):
         entity_channel_to_post = await client_session.get_entity(channel_to_post)
         blob = await client_session.download_media(post, bytes)
         file = await client_session.upload_file(blob)
@@ -38,6 +47,7 @@ async def processing(client_session: TelegramClient, post: Message, photo_or_vid
         raise Exceptions.ExceptionOnUnsuitablePost('пост либо рекламный / либо не содержит медиа')
 
 
+@lru_cache
 def check_post_on_media(mime_type: str, type_of_media: str) -> bool:
     if re.search(type_of_media, mime_type):
         return True
@@ -53,8 +63,8 @@ def check_post_on_advert(message: str) -> bool:
     return True
 
 
-def check_on_date(timestamp_of_post: int, lower_date_timestamp: int) -> Union[None, True]:
-    if timestamp_of_post < lower_date_timestamp:
-        pass
+def check_on_date(timestamp_of_post: Union[int, float], lower_date_timestamp: Union[int, float]) -> Union[None, bool]:
+    if timestamp_of_post > lower_date_timestamp:
+        raise Exceptions.ExceptionOnDateOfPost('Пост вышел за рамки времени')
     else:
         return True
