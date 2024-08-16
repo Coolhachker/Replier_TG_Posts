@@ -2,6 +2,8 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from src.exceptions.castom_exceptions import Exceptions
 from typing import Union
+from functools import lru_cache
+from typing import Any
 # Образец коллекции "collection_for_parser_configs"
 # {
 #     "from": [
@@ -63,7 +65,7 @@ class MongoDBClient:
         else:
             pass
 
-    def add_data_in_entry(self, collection: Collection, key: str, data: dict, uniq_key: str, uniq_value: Union[str, int]):
+    def add_data_in_entry(self, collection: Collection, key: str, data: Any, uniq_key: str, uniq_value: Union[str, int]):
         entry = self.get_entry(collection, uniq_key, uniq_value)
         data_from_db = entry[key]
         if type(data_from_db) is list:
@@ -104,6 +106,7 @@ class MongoDBClient:
         for element in data_from_db:
             return element[channel_url]['emoji']
 
+    @lru_cache
     def get_config_of_channel(self, channel: str, direction: str) -> dict:
         entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)[direction]
         index_channel = [key for obj in entry for key in obj.keys()].index(channel)
@@ -112,6 +115,9 @@ class MongoDBClient:
     @staticmethod
     def delete_entry(collection: Collection, uniq_key: str, uniq_value: Union[str, int]):
         collection.delete_one({uniq_key: uniq_value})
+
+    def zeroing_offset_id(self, task_name):
+        self.add_data_in_entry(client_mongodb.collection_for_id_offsets, 'id_offset', 0, 'task_name', task_name)
 
 
 client_mongodb = MongoDBClient()
