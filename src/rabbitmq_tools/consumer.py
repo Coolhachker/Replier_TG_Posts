@@ -26,6 +26,7 @@ class Consumer:
         self.confirm_the_request(channel, method, properties, body)
 
     def consume(self):
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(queue=self.queue, on_message_callback=self.callback)
         self.channel.start_consuming()
 
