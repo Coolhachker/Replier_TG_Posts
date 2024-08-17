@@ -10,6 +10,7 @@ from typing import List, Tuple
 from logging import basicConfig
 from processing_posts import processing
 from check_a_post_on_overlap_in_channel_to import check_post
+from src.rabbitmq_tools.consumer import consumer
 #TODO: нужно написать систему динамического обновления переменных, а то бишь сделать постоянный вызов функций для обновления
 #   конфигов.
 # TODO: нужно будет переписать функции unpack_config_..., когда напишу тг бота.
@@ -126,7 +127,7 @@ class ReplierEngine:
         for task in self.task_names:
             if task not in tasks_running:
                 channel_from, channel_to = task.split('-')[0], task.split('-')[1]
-                tasks_waiting.append(asyncio.create_task(self.central_processing_of_task(channel_to, channel_from), name=task))
+                tasks_waiting.append(asyncio.create_task(self.central_processing_of_task(channel_to, channel_from), name=task).add_done_callback(callback_of_work_task))
                 client_mongodb.register_entry_in_collection_for_id_offsets(task)
         return tasks_waiting
 
@@ -148,8 +149,9 @@ class ReplierEngine:
         return emoji, periodicity
 
 
-async def callback_of_task(task):
-    pass
+async def callback_of_work_task(task: asyncio.Task):
+    task_name = task.get_name()
+    consumer.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}')
 
 
 if __name__ == '__main__':
