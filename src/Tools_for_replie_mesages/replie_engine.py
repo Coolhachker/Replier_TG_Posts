@@ -26,7 +26,6 @@ class ReplierEngine:
     """
     def __init__(self, api_id: int, api_hash: str):
         self.client_session = TelegramClient('session', api_id, api_hash)
-        self.client_session.start()
         self.channels_from_get_the_posts = client_mongodb.get_channels_url('from')
         self.channels_to_posts_the_posts = client_mongodb.get_channels_url('to')
         self.task_names: List[str] = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['task_names']
@@ -153,7 +152,3 @@ async def callback_of_work_task(task: asyncio.Task):
     task_name = task.get_name()
     consumer.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}')
 
-
-if __name__ == '__main__':
-    replier_engine = ReplierEngine(19567654, 'gkadnfnsdkbd')
-    asyncio.get_event_loop().run_until_complete(replier_engine.central_processing_of_register_tasks())
