@@ -46,7 +46,8 @@ class MongoDBClient:
             'to': [],
             'stop_words': ['👇👇👇', '👇', 'Подробности', 'НОВОСТИ С ФРОНТА', 'СВО', 'теперь в Telegram', 'Жуткая статистика', 'переплачиваете',
                            'Хватит переплачивать', '@', 'Читать далее', 'Фулл', 'Видео без цензуры', 'Прямая трансляция'],
-            'task_names': []
+            'task_names': [],
+            'status_check': ''
         }
 
         if self.collection_for_parser_configs.find_one({'uniq_key': self.uniq_key}) is None:
@@ -118,6 +119,10 @@ class MongoDBClient:
 
     def zeroing_offset_id(self, task_name):
         self.add_data_in_entry(client_mongodb.collection_for_id_offsets, 'id_offset', 0, 'task_name', task_name)
+
+    def get_status_of_parser(self):
+        status = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['status_check']
+        return status
 
 
 client_mongodb = MongoDBClient()
