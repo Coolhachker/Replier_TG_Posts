@@ -1,5 +1,3 @@
-import re
-from src.databases.mongodb import client_mongodb
 from src.Tools_for_replie_mesages.entry_point import main
 from src.Tools_for_replie_mesages.entry_point import main_task
 

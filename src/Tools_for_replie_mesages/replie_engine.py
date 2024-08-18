@@ -8,8 +8,8 @@ from typing import Union
 from datetime import datetime
 from typing import List, Tuple
 from logging import basicConfig
-from processing_posts import processing
-from check_a_post_on_overlap_in_channel_to import check_post
+from src.Tools_for_replie_mesages.processing_posts import processing
+from src.Tools_for_replie_mesages.check_a_post_on_overlap_in_channel_to import check_post
 from src.rabbitmq_tools.consumer import consumer
 #TODO: нужно написать систему динамического обновления переменных, а то бишь сделать постоянный вызов функций для обновления
 #   конфигов.
