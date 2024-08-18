@@ -151,4 +151,3 @@ class ReplierEngine:
 async def callback_of_work_task(task: asyncio.Task):
     task_name = task.get_name()
     consumer.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}')
-
