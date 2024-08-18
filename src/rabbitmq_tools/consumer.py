@@ -18,6 +18,7 @@ class Consumer:
         self.declare_queue()
 
         self.consume()
+        self.channel.start_consuming()
 
     def declare_queue(self):
         self.channel.queue_declare(queue=self.queue, durable=True)

@@ -1,6 +1,6 @@
 from src.rabbitmq_tools.producer_commands import Commands
-from start_parser import start_parser
-from stop_parser import stop_parser
+from src.Tools_for_execute_producer_comands.start_parser import start_parser
+from src.Tools_for_execute_producer_comands.stop_parser import stop_parser
 
 
 def execute_producer_commands(command: str):
