@@ -124,5 +124,8 @@ class MongoDBClient:
         status = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['status_check']
         return status
 
+    def update_status_of_parser(self, status):
+        self.add_data_in_entry(self.collection_for_parser_configs, 'status_check', status, 'uniq_key', self.uniq_key)
+
 
 client_mongodb = MongoDBClient()
