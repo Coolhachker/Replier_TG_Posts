@@ -48,7 +48,7 @@ class MongoDBClient:
                            'Хватит переплачивать', '@', 'Читать далее', 'Фулл', 'Видео без цензуры', 'Прямая трансляция'],
             'task_names': [],
             'status_check': '',
-            'pid_of_process': 0
+            'parser_process': None
         }
 
         if self.collection_for_parser_configs.find_one({'uniq_key': self.uniq_key}) is None:
@@ -127,6 +127,9 @@ class MongoDBClient:
 
     def update_status_of_parser(self, status):
         self.add_data_in_entry(self.collection_for_parser_configs, 'status_check', status, 'uniq_key', self.uniq_key)
+
+    def update_process_parser(self, process_parser):
+        self.add_data_in_entry(self.collection_for_parser_configs, 'parser_process', process_parser, 'uniq_key', self.uniq_key)
 
 
 client_mongodb = MongoDBClient()
