@@ -36,7 +36,8 @@ class ReplierEngine:
         :return:
         """
         self.create_a_task_names()
-        await asyncio.gather(*self.create_tasks_for_replies())
+        list_of_tasks = self.create_tasks_for_replies()
+        await asyncio.gather(*list_of_tasks)
 
     async def central_processing_of_task(self, channel_to_post: str, channel_from_to_get_post: str):
         """
@@ -126,7 +127,9 @@ class ReplierEngine:
         for task in self.task_names:
             if task not in tasks_running:
                 channel_from, channel_to = task.split('-')[0], task.split('-')[1]
-                tasks_waiting.append(asyncio.create_task(self.central_processing_of_task(channel_to, channel_from), name=task).add_done_callback(callback_of_work_task))
+                task_for_replier = asyncio.create_task(self.central_processing_of_task(channel_to, channel_from), name=task)
+                task_for_replier.add_done_callback(callback_of_work_task)
+                tasks_waiting.append(task_for_replier)
                 client_mongodb.register_entry_in_collection_for_id_offsets(task)
         return tasks_waiting
 
@@ -148,6 +151,6 @@ class ReplierEngine:
         return emoji, periodicity
 
 
-async def callback_of_work_task(task: asyncio.Task):
+def callback_of_work_task(task: asyncio.Task):
     task_name = task.get_name()
     publisher.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}', Queue.callback_queue)
