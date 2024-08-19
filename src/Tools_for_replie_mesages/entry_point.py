@@ -14,7 +14,6 @@ def main():
         replier_engine = ReplierEngine(19567654, 'gkadnfnsdkbd')
         client_mongodb.update_status_of_parser('OK: Парсер работает')
         logger.info('Парсер работает')
-        client_mongodb.update_pid_of_parser(os.getpid())
         asyncio.get_event_loop().run_until_complete(replier_engine.central_processing_of_register_tasks())
     finally:
         logger.info('Парсер перестал работать')
