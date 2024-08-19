@@ -4,6 +4,7 @@ from pika.spec import Basic, BasicProperties
 from typing import Any
 from src.databases.mongodb import client_mongodb
 from src.Tools_for_execute_producer_comands.executer import execute_producer_commands
+from src.rabbitmq_tools.queue_dataclass import Queue
 
 
 class Consumer:
@@ -11,8 +12,8 @@ class Consumer:
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
         self.channel = self.connection.channel()
 
-        self.queue = 'parser'
-        self.queue_callback = 'parser_callback'
+        self.queue = Queue.parser_queue
+        self.queue_callback = Queue.callback_queue
         self.exchange = ''
 
         self.declare_queue()
