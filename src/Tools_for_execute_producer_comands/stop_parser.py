@@ -7,4 +7,4 @@ def stop_parser():
     if parser_process is None:
         return 'ОК: Парсер не работает'
     else:
-        subprocess.run(['kill', parser_process])
+        subprocess.run(['kill', str(parser_process)])
