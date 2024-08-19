@@ -1,10 +1,10 @@
-from src.Tools_for_replie_mesages.entry_point import main
-from src.Tools_for_replie_mesages.entry_point import main_task
-import asyncio
+from src.databases.mongodb import client_mongodb
+import subprocess
 
 
 def stop_parser():
-    if main_task.done() is True:
+    parser_process = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['pid_of_parser']
+    if parser_process is None:
         return 'ОК: Парсер не работает'
     else:
-        main_task.cancel()
+        subprocess.run(['kill', parser_process])
