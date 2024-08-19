@@ -7,15 +7,14 @@ from src.exceptions.castom_exceptions import Exceptions
 from typing import Union
 from datetime import datetime
 from typing import List, Tuple
-from logging import basicConfig
 from src.Tools_for_replie_mesages.processing_posts import processing
 from src.Tools_for_replie_mesages.check_a_post_on_overlap_in_channel_to import check_post
-from src.rabbitmq_tools.consumer import consumer
+from src.rabbitmq_tools.publish_a_message import publisher
+from src.rabbitmq_tools.queue_dataclass import Queue
 #TODO: нужно написать систему динамического обновления переменных, а то бишь сделать постоянный вызов функций для обновления
 #   конфигов.
 # TODO: нужно будет переписать функции unpack_config_..., когда напишу тг бота.
 
-basicConfig(filename='../../data/replier.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
 logger = logging.getLogger()
 
 
@@ -151,4 +150,4 @@ class ReplierEngine:
 
 async def callback_of_work_task(task: asyncio.Task):
     task_name = task.get_name()
-    consumer.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}')
+    publisher.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}', Queue.callback_queue)
