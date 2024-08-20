@@ -3,6 +3,8 @@ from pika.adapters.blocking_connection import BlockingChannel
 from pika.spec import Basic, BasicProperties
 from typing import Any
 from src.databases.mongodb import client_mongodb
+from src.Tools_for_execute_producer_comands.executer import execute_producer_commands
+from src.rabbitmq_tools.queue_dataclass import Queue
 
 
 class Consumer:
@@ -10,13 +12,14 @@ class Consumer:
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
         self.channel = self.connection.channel()
 
-        self.queue = 'parser'
-        self.queue_callback = 'parser_callback'
+        self.queue = Queue.parser_queue
+        self.queue_callback = Queue.callback_queue
         self.exchange = ''
 
         self.declare_queue()
 
         self.consume()
+        self.channel.start_consuming()
 
     def declare_queue(self):
         self.channel.queue_declare(queue=self.queue, durable=True)
@@ -31,11 +34,12 @@ class Consumer:
         self.channel.start_consuming()
 
     def confirm_the_request(self, channel: BlockingChannel, method: Basic.Deliver, properties: BasicProperties, body: bytes):
+        result = execute_producer_commands(body.decode())
         status_of_parser: str = client_mongodb.get_status_of_parser()
         channel.basic_publish(
             exchange=self.exchange,
             routing_key=properties.reply_to,
-            body=status_of_parser.encode(),
+            body=status_of_parser.encode() if result is None else result.encode(),
         )
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
