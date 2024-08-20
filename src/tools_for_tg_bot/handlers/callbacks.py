@@ -14,3 +14,8 @@ def callbacks(dispatcher: Dispatcher, bot: Bot):
     async def callback_on_stop_parser(cq: CallbackQuery):
         result = producer.publish(Commands.TURN_OFF_COMMAND)
         await bot.send_message(cq.message.chat.id, result)
+
+    @dispatcher.callback_query(lambda cq: cq.data == 'check_parser')
+    async def callback_on_check_parser(cq: CallbackQuery):
+        result = producer.publish(Commands.CHECK_PARSER_COMMAND)
+        await bot.send_message(cq.message.chat.id, result)
