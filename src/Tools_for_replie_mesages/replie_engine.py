@@ -11,9 +11,6 @@ from src.Tools_for_replie_mesages.processing_posts import processing
 from src.Tools_for_replie_mesages.check_a_post_on_overlap_in_channel_to import check_post
 from src.rabbitmq_tools.publish_a_message import publisher
 from src.rabbitmq_tools.queue_dataclass import Queue
-#TODO: нужно написать систему динамического обновления переменных, а то бишь сделать постоянный вызов функций для обновления
-#   конфигов.
-# TODO: нужно будет переписать функции unpack_config_..., когда напишу тг бота.
 
 logger = logging.getLogger()
 
@@ -65,7 +62,7 @@ class ReplierEngine:
                 await check_post(post, self.client_session, channel_to_post)
 
                 #обработка поста
-                data_for_send_in_channels = await processing(self.client_session, post, video_or_photo, channel_to_post, emoji, lower_datetime_limit)
+                data_for_send_in_channels = await processing(self.client_session, post, video_or_photo, channel_to_post, emoji, lower_datetime_limit, morning_post)
 
                 logger.debug(data_for_send_in_channels)
                 await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)

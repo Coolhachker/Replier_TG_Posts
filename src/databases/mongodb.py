@@ -133,3 +133,4 @@ class MongoDBClient:
 
 
 client_mongodb = MongoDBClient()
+print(client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key))

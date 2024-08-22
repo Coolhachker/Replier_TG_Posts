@@ -74,28 +74,28 @@
 </head>
 <body>
 <div class="container">
-    <h1>Data Collection Form</h1>
+    <h1>Форма для регестрации канала</h1>
     <div>
-        <label for="category">Select Category:</label>
+        <label for="category">Выберите категорию:</label>
         <select id="category" onchange="toggleForms()">
             <option value="">Select...</option>
-            <option value="from">From</option>
-            <option value="to">To</option>
+            <option value="from">Откуда брать</option>
+            <option value="to">Куда сбывать</option>
         </select>
     </div>
 
     <div id="from-form" class="form-section">
-        <h2>From Parameter</h2>
+        <h2>ПАРАМЕТРЫ КАНАЛА ОТКУДА БРАТЬ ПОСТЫ</h2>
         <div class="form-group">
-            <label for="channel-link">Channel Link:</label>
-            <input type="text" id="channel-link" placeholder="Enter channel link" required>
+            <label for="channel-link">Ссылка на канал:</label>
+            <input type="text" id="channel-link" placeholder="ссылка" required>
         </div>
         <div class="form-group">
-            <label for="date-from">Date From:</label>
+            <label for="date-from">Верхняя граница времени:</label>
             <input type="date" id="date-from" required>
         </div>
         <div class="form-group">
-            <label for="date-to">Date To:</label>
+            <label for="date-to">Нижняя граница времени:</label>
             <input type="date" id="date-to" required>
         </div>
         <div class="form-group">
@@ -106,30 +106,30 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="morning-post">Morning Post:</label>
+            <label for="morning-post">Утренний пост:</label>
             <select id="morning-post" required>
                 <option value="true">True</option>
                 <option value="false">False</option>
             </select>
         </div>
-        <button onclick="submitFrom()">Submit From</button>
+        <button onclick="submitFrom()">Подтвердить</button>
     </div>
 
     <div id="to-form" class="form-section">
-        <h2>To Parameter</h2>
+        <h2>ПАРАМЕТРЫ КАНАЛА КУДА СБЫВАТЬ ПОСТЫ</h2>
         <div class="form-group">
-            <label for="channel-link">Channel Link:</label>
-            <input type="text" id="channel-link-to" placeholder="Enter channel link" required>
+            <label for="channel-link">Ссылка на канал</label>
+            <input type="text" id="channel-link-to" placeholder="ссылка" required>
         </div>
         <div class="form-group">
-            <label for="frequency">Frequency:</label>
-            <input type="text" id="frequency" placeholder="Enter frequency" required>
+            <label for="frequency">Периодичность</label>
+            <input type="text" id="frequency" placeholder="периодичность" required>
         </div>
         <div class="form-group">
             <label for="emoji">Emoji:</label>
             <input type="text" id="emoji" placeholder="Enter emoji" required>
         </div>
-        <button onclick="submitTo()">Submit To</button>
+        <button onclick="submitTo()">Подтвердить</button>
     </div>
     <div id="btn_status" class="hint" style="display: none;"></div>
 </div>
@@ -151,16 +151,28 @@
         const channelLink = document.getElementById('channel-link').value;
         const dateFrom = document.getElementById('date-from').value;
         const dateTo = document.getElementById('date-to').value;
-        const videoOfPhoto = document.getElementById('video-of-photo').value;
+        const videoOrPhoto = document.getElementById('video-of-photo').value;
         const morningPost = document.getElementById('morning-post').value;
 
         console.log('From Parameters:', {
             channelLink,
             dateFrom,
             dateTo,
-            videoOfPhoto,
+            videoOrPhoto,
             morningPost
         });
+        let data = {
+            direction: 'from',
+            url: channelLink,
+            date_from: dateFrom,
+            date_to: dateTo,
+            video_or_photo: videoOrPhoto,
+            morning_post: morningPost,
+            _auth: initData,
+            msg_id: '',
+            with_webview: 0
+        }
+        sendMessage('', false, data)
         alert('From parameters submitted! Check console for details.');
     }
 
@@ -174,6 +186,7 @@
             emoji
         });
         let data = {
+            direction: 'to',
             url: url,
             periodic: frequency,
             emoji: emoji,

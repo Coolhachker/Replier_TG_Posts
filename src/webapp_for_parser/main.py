@@ -1,6 +1,6 @@
 from aiohttp.web import run_app, _run_app
 from aiohttp.web_app import Application
-from src.webapp_for_parser.routes import check_data_handler, demo_handler, send_message_handler
+from src.webapp_for_parser.routes import check_data_handler, demo_handler, send_form_handler
 from src.tools_for_tg_bot.bot_for_replies import BotForReplies
 from aiogram import Bot, Dispatcher
 from aiogram.types import MenuButtonWebApp, WebAppInfo
@@ -36,7 +36,7 @@ class WebApp:
 
         self.app.router.add_get("/main", demo_handler)
         self.app.router.add_post("/main/checkData", check_data_handler)
-        self.app.router.add_post("/main/sendForm", send_message_handler)
+        self.app.router.add_post("/main/sendForm", send_form_handler)
         SimpleRequestHandler(
             dispatcher=self.dispatcher,
             bot=self.bot,

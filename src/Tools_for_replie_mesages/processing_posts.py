@@ -16,7 +16,8 @@ async def processing(
         photo_or_video: str,
         channel_to_post: str,
         emoji: str,
-        lowe_limit_timestamp_in_config: Union[int, float]
+        lower_limit_timestamp_in_config: Union[int, float],
+        morning_post: bool
 ) -> dict:
     """
     Основной задачей функции является обработка постов перед их отправкой, а именно
@@ -26,20 +27,21 @@ async def processing(
     :param photo_or_video: 'photo' or 'video'
     :param channel_to_post: url ссылка на канал, куда отправлять сообщения
     :param emoji:
-    :param lowe_limit_timestamp_in_config:
+    :param lower_limit_timestamp_in_config:
+    :param morning_post:
     :return: словарь из данных
     """
     dict_of_data: dict = {}
     mime_type: str = post.media.document.mime_type.split('/')[0]
     message_text: str = post.message
-    if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text) and check_on_date(post.date.timestamp(), lowe_limit_timestamp_in_config):
+    if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text) and check_on_date(post.date.timestamp(), lower_limit_timestamp_in_config):
         entity_channel_to_post = await client_session.get_entity(channel_to_post)
         title = entity_channel_to_post.title
         blob = await client_session.download_media(post, bytes)
         file = await client_session.upload_file(blob)
         file.name = mime_type + '.mp4' if photo_or_video == 'video' else mime_type + '.jpg'
         message_text_split = message_text.split('\n')
-        message_text = message_text_processing(message_text, channel_to_post, title, emoji, message_text_split)
+        message_text = message_text_processing(message_text, channel_to_post, title, emoji, message_text_split, morning_post)
 
         dict_of_data['file'] = file
         dict_of_data['message'] = message_text
@@ -73,10 +75,10 @@ def check_on_date(timestamp_of_post: Union[int, float], lower_date_timestamp: Un
         return True
 
 
-def message_text_processing(message_text: str, channel_to_post: str, title: str, emoji: str, message_text_split: List[str]) -> str:
+def message_text_processing(message_text: str, channel_to_post: str, title: str, emoji: str, message_text_split: List[str], bool_of_morning_post: bool) -> str:
     timestamp_of_now = datetime.datetime.now().timestamp()
     timestamp_of_morning = datetime.datetime.timestamp(datetime.datetime(year=datetime.datetime.today().year, month=datetime.datetime.today().month, day=datetime.datetime.today().day, hour=9, minute=25, second=0))
-    if timestamp_of_now <= timestamp_of_morning:
+    if timestamp_of_now <= timestamp_of_morning and bool_of_morning_post:
         return f'Доброе утро\n<a href="{channel_to_post}">{title}{emoji}</a>'
     else:
         return message_text.replace(message_text_split[-1], f'<a href="{channel_to_post}">{title}{emoji}</a>') if len(message_text_split) > 1 else f'{message_text}\n<a href="{channel_to_post}">{title}{emoji}</a>'
