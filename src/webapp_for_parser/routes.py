@@ -36,30 +36,5 @@ async def send_message_handler(request: Request):
     except ValueError:
         return json_response({"ok": False, "err": "Unauthorized"}, status=401)
 
-    reply_markup = None
-    if data["with_webview"] == "1":
-        reply_markup = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="Open",
-                        web_app=WebAppInfo(
-                            url=str(request.url.with_scheme("https").with_path("demo"))
-                        ),
-                    )
-                ]
-            ]
-        )
-    await bot.answer_web_app_query(
-        web_app_query_id=web_app_init_data.query_id,
-        result=InlineQueryResultArticle(
-            id=web_app_init_data.query_id,
-            title="Demo",
-            input_message_content=InputTextMessageContent(
-                message_text="Hello, World!",
-                parse_mode=None,
-            ),
-            reply_markup=reply_markup,
-        ),
-    )
-    return json_response({"ok": True})
+    await bot.send_message(web_app_init_data.user.id, 'hello, world!')
+    return json_response(data={'ok': True}, status=200)

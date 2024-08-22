@@ -6,12 +6,15 @@ from aiogram import Bot, Dispatcher
 from src.tools_for_tg_bot.middlewares.middleware_on_check_trusted_users import MiddlewareOnTrustUser
 from src.tools_for_tg_bot.middlewares.middleware_on_callback_requests import MiddlewareOnCallback
 from src.tools_for_tg_bot.handlers.rabbitmq_handler import handler_info_responses
+from aiogram import Router
 
 
 class BotForReplies:
     def __init__(self, token):
+        self.router = Router()
         self.bot = Bot(token)
         self.dispatcher = Dispatcher()
+        self.dispatcher.include_router(self.router)
         self.run_sync_functions()
 
     def run_sync_functions(self):
@@ -23,9 +26,9 @@ class BotForReplies:
         asyncio.create_task(handler_info_responses(self.bot))
         self.dispatcher.message.middleware(MiddlewareOnTrustUser(self.bot))
         self.dispatcher.callback_query.middleware(MiddlewareOnCallback(self.bot))
-        await self.dispatcher.start_polling(self.bot)
+        # await self.dispatcher.start_polling(self.bot)
 
 
-if __name__ == '__main__':
-    bot = BotForReplies('6356385807:AAHWycJ5m7jykCVRcDCWUa3BvFL_oRlou5k')
-    asyncio.run(bot.start_pooling())
+# if __name__ == '__main__':
+    # bot = BotForReplies('6356385807:AAHWycJ5m7jykCVRcDCWUa3BvFL_oRlou5k')
+    # asyncio.run(bot.start_pooling())
