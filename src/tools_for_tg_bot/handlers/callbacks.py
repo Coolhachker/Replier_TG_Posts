@@ -5,6 +5,7 @@ from src.rabbitmq_tools.producer_commands import Commands
 from src.tools_for_tg_bot.buttons.add_or_delete_channels_merkup import add_or_delete_channels_markup
 from src.tools_for_tg_bot.Configs.callbacks_configs import CallbacksNames
 from src.tools_for_tg_bot.buttons.webapp_on_add_channel import button_on_add_channel
+from src.tools_for_tg_bot.buttons.webapp_on_delete_channel import button_on_delete_channel
 
 
 def callbacks(dispatcher: Dispatcher, bot: Bot):
@@ -30,3 +31,7 @@ def callbacks(dispatcher: Dispatcher, bot: Bot):
     @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.add_channel)
     async def callback_on_add_channel(cq: CallbackQuery):
         await bot.send_message(cq.message.chat.id, 'Нажмите на кнопку для продолжения действия.', reply_markup=button_on_add_channel())
+
+    @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.delete_channel)
+    async def callback_on_delete_channel(cq: CallbackQuery):
+        await bot.send_message(cq.message.chat.id, 'Нажмите на кнопку для продолжения действия.', reply_markup=button_on_delete_channel())
