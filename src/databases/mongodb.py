@@ -38,6 +38,7 @@ class MongoDBClient:
         self.collection_for_parser_configs = self.client['replies_config_collection']['collection_for_parser_configs']
         self.collection_for_bot_configs = self.client['replies_config_collection']['collection_for_bot_configs']
         self.collection_for_id_offsets = self.client['replies_config_collection']['collection_for_id_offsets']
+        self.collection_for_parser_commands = self.client['replies_config_collection']['collection_for_parser_commands']
 
     def register_entry_channels_config(self):
         data = {
@@ -67,11 +68,14 @@ class MongoDBClient:
         else:
             pass
 
-    def add_data_in_entry(self, collection: Collection, key: str, data: Any, uniq_key: str, uniq_value: Union[str, int]):
+    def add_data_in_entry(self, collection: Collection, key: str, data: Any, uniq_key: str, uniq_value: Union[str, int], update_data_in_entry: bool = False):
         entry = self.get_entry(collection, uniq_key, uniq_value)
         data_from_db = entry[key]
         if type(data_from_db) is list:
-            data_from_db.append(data)
+            if update_data_in_entry is False:
+                data_from_db.append(data)
+            else:
+                data_from_db = data
         else:
             data_from_db = data
 
@@ -130,6 +134,24 @@ class MongoDBClient:
 
     def update_pid_of_parser(self, process_parser):
         self.add_data_in_entry(self.collection_for_parser_configs, 'pid_of_parser', process_parser, 'uniq_key', self.uniq_key)
+
+    # def set_command_entry(self):
+    #     data = {
+    #         'uniq_key': self.uniq_key,
+    #         'command': None,
+    #         'task_name': None,
+    #         'status_of_work': None
+    #     }
+    #     if self.collection_for_parser_commands.find_one({'uniq_key': self.uniq_key}) is None:
+    #         self.collection_for_parser_commands.insert_one(data)
+    #     else:
+    #         pass
+    #
+    # def set_command_in_parser_commands(self, command):
+    #     self.add_data_in_entry(self.collection_for_parser_commands, 'command', command, 'uniq_key', self.uniq_key)
+    #
+    # def set_task_name_in_parser_commands(self, task_name):
+    #     self.add_data_in_entry(self.collection_for_parser_commands, 'task_name', task_name, 'uniq_key', self.uniq_key)
 
 
 client_mongodb = MongoDBClient()

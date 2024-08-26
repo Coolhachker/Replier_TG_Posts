@@ -11,8 +11,12 @@ from src.Tools_for_replie_mesages.processing_posts import processing
 from src.Tools_for_replie_mesages.check_a_post_on_overlap_in_channel_to import check_post
 from src.rabbitmq_tools.publish_a_message import publisher
 from src.rabbitmq_tools.queue_dataclass import Queue
-
+from src.Tools_for_replie_mesages.commands_for_tasks import CommandsForTask
+from src.rabbitmq_tools.producer_commands import Commands
+from src.databases.vedis_db import db_client
+from src.Tools_for_replie_mesages.check_on_tasks import check_on_tasks
 logger = logging.getLogger()
+#TODO: 1. сделать чек работы парсера по конкретным каналам
 
 
 class ReplierEngine:
@@ -22,10 +26,34 @@ class ReplierEngine:
     """
     def __init__(self, api_id: int, api_hash: str):
         self.client_session = TelegramClient('session', api_id, api_hash)
-        self.client_session.start()
         self.channels_from_get_the_posts = client_mongodb.get_channels_url('from')
         self.channels_to_posts_the_posts = client_mongodb.get_channels_url('to')
         self.task_names: List[str] = client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['task_names']
+
+    async def parser_conductor(self):
+        while True:
+            command = db_client.get_object(db_client.key_command)
+            if command == '':
+                await asyncio.sleep(1)
+            elif command == Commands.TURN_ON_COMMAND:
+                asyncio.create_task(self.central_processing_of_register_tasks())
+                db_client.set_object('', db_client.key_command)
+            elif command == CommandsForTask.stop_task:
+                db_client.set_object('working', db_client.status)
+
+                task_name = db_client.get_object(db_client.key_task_name)
+                self.central_processing_of_commands_to_task(command, task_name)
+
+                await db_client.set_object('', db_client.status)
+                await db_client.set_object('', db_client.key_command)
+
+    @staticmethod
+    def central_processing_of_commands_to_task(command: str, task_name: str):
+        if command == CommandsForTask.stop_task:
+            task_objects = asyncio.all_tasks()
+            print(task_objects)
+            task = [task for task in task_objects if task.get_name() == task_name][0]
+            task.cancel()
 
     async def central_processing_of_register_tasks(self):
         """
@@ -34,6 +62,7 @@ class ReplierEngine:
         """
         self.create_a_task_names()
         list_of_tasks = self.create_tasks_for_replies()
+        logger.info(f'Таски для работы: {list_of_tasks}')
         await asyncio.gather(*list_of_tasks)
 
     async def central_processing_of_task(self, channel_to_post: str, channel_from_to_get_post: str):
@@ -43,7 +72,9 @@ class ReplierEngine:
         :param channel_from_to_get_post: канал, откуда брать посты
         :return:
         """
-        task_name = asyncio.current_task().get_name()
+        await asyncio.sleep(10000)
+        task = asyncio.current_task()
+        task_name = task.get_name()
         while True:
             try:
                 # получаю динамически конфиги
@@ -104,6 +135,7 @@ class ReplierEngine:
         Создание имен для тасков.
         :return:
         """
+        logger.info('Создание имен тасков')
         for channel_to in self.channels_to_posts_the_posts:
             for channel_from in self.channels_from_get_the_posts:
                 if f'{channel_from}-{channel_to}' not in self.task_names:
@@ -128,6 +160,8 @@ class ReplierEngine:
                 task_for_replier.add_done_callback(callback_of_work_task)
                 tasks_waiting.append(task_for_replier)
                 client_mongodb.register_entry_in_collection_for_id_offsets(task)
+
+        logger.info('Создал таски для пересылки сообщений')
         return tasks_waiting
 
     @staticmethod
@@ -151,3 +185,6 @@ class ReplierEngine:
 def callback_of_work_task(task: asyncio.Task):
     task_name = task.get_name()
     publisher.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}', Queue.callback_queue)
+
+
+replier_engine = ReplierEngine(19567654, 'gkadnfnsdkbd')

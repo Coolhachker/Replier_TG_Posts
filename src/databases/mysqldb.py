@@ -44,6 +44,8 @@ class MysqlDB:
 
     def get_chat_id_of_trusted_users(self) -> typing.List[str]:
         self.cursor.execute('SELECT user_nickname FROM trusted_users')
+        print(client_mysqldb.cursor.fetchall())
+        breakpoint()
         trusted_users = [user[1] for user in client_mysqldb.cursor.fetchall()]
         return trusted_users
 

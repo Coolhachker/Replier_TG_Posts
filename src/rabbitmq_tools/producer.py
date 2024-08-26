@@ -2,6 +2,7 @@ import pika
 from typing import Any, Optional, Union
 import re
 from src.exceptions.castom_exceptions import Exceptions
+from src.rabbitmq_tools.queue_dataclass import Queue
 
 
 class Producer:
@@ -12,6 +13,7 @@ class Producer:
         self.exchange = ''
         self.queue = 'parser'
         self.callback_queue = 'parser_callback'
+        self.parser_tasks_queue = Queue.parser_task_queue
 
         self.declare_queue()
         self.consume_the_response()
@@ -22,11 +24,12 @@ class Producer:
     def declare_queue(self):
         self.channel.queue_declare(queue=self.queue, durable=True)
         self.channel.queue_declare(queue='parser_callback', durable=True)
+        self.channel.queue_declare(queue=self.parser_tasks_queue, durable=True)
 
-    def publish(self, message: Any, properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent)):
+    def publish(self, message: Any, properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent), queue=None):
         self.channel.basic_publish(
             exchange=self.exchange,
-            routing_key=self.queue,
+            routing_key=self.queue if queue is None else queue,
             body=message.encode(),
             properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent, reply_to=self.callback_queue)
         )

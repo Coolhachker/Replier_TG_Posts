@@ -39,15 +39,35 @@
         function submitChannel() {
             const selectElement = document.getElementById('channel-select');
             const selectedValue = selectElement.value;
-            const messageElement = document.getElementById('message');
 
-        }
+            $.ajax('/channel/delete_channel', {
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    direction: 'from',
+                    _auth: initData,
+                    channel: selectedValue
+                    },
+                success: function (result) {
+                    alert('Успешное удаление!')
+                },
+                error: function(xhr) {
+                    alert('server error');
+                }
+            });
+            webviewClose();
+
+        };
         function addChannelToList(channelName) {
             const option = document.createElement('option');
             option.value = channelName;
             option.textContent = channelName;
             document.getElementById('channel-select').appendChild(option);
-        }
+        };
+
+        function webviewClose() {
+            Telegram.WebApp.close();
+    }
 
     </script>
     <style>

@@ -1,9 +1,11 @@
-from src.Tools_for_replie_mesages.replie_engine import ReplierEngine
-from src.databases.mongodb import client_mongodb
 import asyncio
-import os
+from src.Tools_for_replie_mesages.replie_engine import replier_engine
+from src.databases.mongodb import client_mongodb
 import logging
 from logging import basicConfig
+from src.databases.vedis_db import db_client
+from src.rabbitmq_tools.producer_commands import Commands
+
 basicConfig(filename='../../data/replier.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
 logger = logging.getLogger()
 
@@ -11,10 +13,14 @@ logger = logging.getLogger()
 def main():
     try:
         logger.info('START ENTRY_POINT')
-        replier_engine = ReplierEngine(19567654, 'gkadnfnsdkbd')
+        replier_engine.client_session.start()
+        event_loop = asyncio.get_event_loop()
         client_mongodb.update_status_of_parser('OK: Парсер работает')
+        db_client.set_object(Commands.TURN_ON_COMMAND, db_client.key_command)
+
         logger.info('Парсер работает')
-        asyncio.get_event_loop().run_until_complete(replier_engine.central_processing_of_register_tasks())
+
+        event_loop.run_until_complete(replier_engine.parser_conductor())
     finally:
         logger.info('Парсер перестал работать')
         client_mongodb.update_pid_of_parser(None)

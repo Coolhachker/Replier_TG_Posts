@@ -14,3 +14,7 @@ class Exceptions:
     class UnSuccessfulResponseRMQ(Exception):
         def __init__(self, message):
             super().__init__(message)
+
+    class NoTasks(Exception):
+        def __init__(self, message):
+            super().__init__(message)

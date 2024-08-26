@@ -49,5 +49,5 @@ async def register_channel_from_get_the_posts(bot: Bot, chat_id: int, data) -> N
     client_mongodb.register_entry_channels_config()
     client_mongodb.update_data_in_entity_in_collection_for_parser_configs('from', url, data_of_channel)
 
-    await bot.send_message(chat_id, f'✅︎ Добавил в базу данных канал:\n**{url}**', parse_mode='markdown')
+    await bot.send_message(chat_id, f'✅︎ Добавил в базу данных канал:\n<b>{url}</b>', parse_mode='html')
 

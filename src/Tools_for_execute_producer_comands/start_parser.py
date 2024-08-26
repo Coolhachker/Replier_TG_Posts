@@ -11,4 +11,4 @@ def start_parser():
         client_mongodb.update_pid_of_parser(process_pid)
         time.sleep(5)
     else:
-        return 'OK: Парсер уже работает'
+        return 'OK: Парсер работает'
