@@ -43,10 +43,8 @@ class MysqlDB:
         self.connection.commit()
 
     def get_chat_id_of_trusted_users(self) -> typing.List[str]:
-        self.cursor.execute('SELECT user_nickname FROM trusted_users')
-        print(client_mysqldb.cursor.fetchall())
-        breakpoint()
-        trusted_users = [user[1] for user in client_mysqldb.cursor.fetchall()]
+        self.cursor.execute('SELECT chat_id FROM trusted_users')
+        trusted_users = [user[0] for user in client_mysqldb.cursor.fetchall()]
         return trusted_users
 
     @lru_cache(maxsize=128)

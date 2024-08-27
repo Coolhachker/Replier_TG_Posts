@@ -2,6 +2,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram import Dispatcher, Bot
 from src.tools_for_tg_bot.buttons.button_choose_the_action import choose_the_action_button
+from src.databases.mysqldb import client_mysqldb
 
 
 def commands(dispatcher: Dispatcher, bot: Bot):

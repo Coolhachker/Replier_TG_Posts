@@ -135,23 +135,30 @@ class MongoDBClient:
     def update_pid_of_parser(self, process_parser):
         self.add_data_in_entry(self.collection_for_parser_configs, 'pid_of_parser', process_parser, 'uniq_key', self.uniq_key)
 
-    # def set_command_entry(self):
-    #     data = {
-    #         'uniq_key': self.uniq_key,
-    #         'command': None,
-    #         'task_name': None,
-    #         'status_of_work': None
-    #     }
-    #     if self.collection_for_parser_commands.find_one({'uniq_key': self.uniq_key}) is None:
-    #         self.collection_for_parser_commands.insert_one(data)
-    #     else:
-    #         pass
-    #
-    # def set_command_in_parser_commands(self, command):
-    #     self.add_data_in_entry(self.collection_for_parser_commands, 'command', command, 'uniq_key', self.uniq_key)
-    #
-    # def set_task_name_in_parser_commands(self, task_name):
-    #     self.add_data_in_entry(self.collection_for_parser_commands, 'task_name', task_name, 'uniq_key', self.uniq_key)
+    def set_command_entry(self):
+        data = {
+            'uniq_key': self.uniq_key,
+            'command': None,
+            'task_name': None,
+            'status_of_work': None
+        }
+        if self.collection_for_parser_commands.find_one({'uniq_key': self.uniq_key}) is None:
+            self.collection_for_parser_commands.insert_one(data)
+        else:
+            pass
+
+    def set_command_in_parser_commands(self, command: Union[str, None]):
+        self.add_data_in_entry(self.collection_for_parser_commands, 'command', command, 'uniq_key', self.uniq_key)
+
+    def set_task_name_in_parser_commands(self, task_name: str):
+        self.add_data_in_entry(self.collection_for_parser_commands, 'task_name', task_name, 'uniq_key', self.uniq_key)
+
+    def set_status_of_work_in_parser_commands(self, status: Union[str, None]):
+        self.add_data_in_entry(self.collection_for_parser_commands, 'status_of_work', status, 'uniq_key', self.uniq_key)
+
+    def get_data_from_entry_in_parser_commands(self, key: str):
+        entry = self.get_entry(self.collection_for_parser_commands, 'uniq_key', client_mongodb.uniq_key)
+        return entry[key]
 
 
 client_mongodb = MongoDBClient()

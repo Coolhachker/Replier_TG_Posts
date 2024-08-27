@@ -1,3 +1,5 @@
+import asyncio
+
 from src.rabbitmq_tools.producer_commands import Commands
 from src.Tools_for_execute_producer_comands.start_parser import start_parser
 from src.Tools_for_execute_producer_comands.stop_parser import stop_parser

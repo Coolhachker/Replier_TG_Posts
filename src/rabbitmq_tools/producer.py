@@ -7,7 +7,9 @@ from src.rabbitmq_tools.queue_dataclass import Queue
 
 class Producer:
     def __init__(self, host):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
+        parameters = pika.ConnectionParameters(heartbeat=120, host=host)
+
+        self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
 
         self.exchange = ''

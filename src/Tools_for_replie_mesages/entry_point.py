@@ -3,7 +3,6 @@ from src.Tools_for_replie_mesages.replie_engine import replier_engine
 from src.databases.mongodb import client_mongodb
 import logging
 from logging import basicConfig
-from src.databases.vedis_db import db_client
 from src.rabbitmq_tools.producer_commands import Commands
 
 basicConfig(filename='../../data/replier.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
@@ -16,7 +15,8 @@ def main():
         replier_engine.client_session.start()
         event_loop = asyncio.get_event_loop()
         client_mongodb.update_status_of_parser('OK: Парсер работает')
-        db_client.set_object(Commands.TURN_ON_COMMAND, db_client.key_command)
+        client_mongodb.set_command_entry()
+        client_mongodb.set_command_in_parser_commands(Commands.TURN_ON_COMMAND)
 
         logger.info('Парсер работает')
 

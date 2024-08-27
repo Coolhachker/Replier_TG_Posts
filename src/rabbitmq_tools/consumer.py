@@ -10,7 +10,8 @@ import json
 
 class Consumer:
     def __init__(self, host):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
+        parameters = pika.ConnectionParameters(heartbeat=120, host=host)
+        self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
 
         self.queue = Queue.parser_queue

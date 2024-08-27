@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="format-detection" content="telephone=no"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="MobileOptimized" content="176"/>
@@ -88,7 +88,7 @@
         <h2>ПАРАМЕТРЫ КАНАЛА ОТКУДА БРАТЬ ПОСТЫ</h2>
         <div class="form-group">
             <label for="channel-link">Ссылка на канал:</label>
-            <input type="text" id="channel-link" placeholder="ссылка" required>
+            <input onkeydown="clear_keyboard(event.key, 'channel-link')" type="text" id="channel-link" placeholder="ссылка" required>
         </div>
         <div class="form-group">
             <label for="date-from">Верхняя граница времени:</label>
@@ -119,15 +119,15 @@
         <h2>ПАРАМЕТРЫ КАНАЛА КУДА СБЫВАТЬ ПОСТЫ</h2>
         <div class="form-group">
             <label for="channel-link">Ссылка на канал</label>
-            <input type="text" id="channel-link-to" placeholder="ссылка" required>
+            <input onkeydown="clear_keyboard(event.key, 'channel-link-to')" type="text" id="channel-link-to" placeholder="ссылка" required>
         </div>
         <div class="form-group">
             <label for="frequency">Периодичность</label>
-            <input type="text" id="frequency" placeholder="периодичность" required>
+            <input onkeydown="clear_keyboard(event.key, 'frequency')" type="text" id="frequency" placeholder="периодичность" required>
         </div>
         <div class="form-group">
             <label for="emoji">Emoji:</label>
-            <input type="text" id="emoji" placeholder="Enter emoji" required>
+            <input onkeydown="clear_keyboard(event.key, 'emoji')" type="text" id="emoji" placeholder="Enter emoji" required>
         </div>
         <button onclick="submitTo()">Подтвердить</button>
     </div>
@@ -243,6 +243,13 @@
             }
         });
         webviewClose();
+    }
+
+    function clear_keyboard(key, id_of_input){
+        const element = document.getElementById(id_of_input);
+        if (key == 'Enter') {
+            element.blur();
+        };
     }
 </script>
 </html>

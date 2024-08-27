@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from asyncio import Task
 from telethon import TelegramClient
 from src.databases.mongodb import client_mongodb
@@ -13,7 +14,6 @@ from src.rabbitmq_tools.publish_a_message import publisher
 from src.rabbitmq_tools.queue_dataclass import Queue
 from src.Tools_for_replie_mesages.commands_for_tasks import CommandsForTask
 from src.rabbitmq_tools.producer_commands import Commands
-from src.databases.vedis_db import db_client
 from src.Tools_for_replie_mesages.check_on_tasks import check_on_tasks
 logger = logging.getLogger()
 #TODO: 1. сделать чек работы парсера по конкретным каналам
@@ -32,26 +32,22 @@ class ReplierEngine:
 
     async def parser_conductor(self):
         while True:
-            command = db_client.get_object(db_client.key_command)
-            if command == '':
+            command = client_mongodb.get_data_from_entry_in_parser_commands('command')
+            if command is None:
                 await asyncio.sleep(1)
             elif command == Commands.TURN_ON_COMMAND:
-                asyncio.create_task(self.central_processing_of_register_tasks())
-                db_client.set_object('', db_client.key_command)
+                await asyncio.create_task(self.command_turn_on_parser())
             elif command == CommandsForTask.stop_task:
-                db_client.set_object('working', db_client.status)
-
-                task_name = db_client.get_object(db_client.key_task_name)
-                self.central_processing_of_commands_to_task(command, task_name)
-
-                await db_client.set_object('', db_client.status)
-                await db_client.set_object('', db_client.key_command)
+                self.command_stop_task(command)
+            elif command == Commands.CHECK_PARSER_COMMAND:
+                client_mongodb.set_status_of_work_in_parser_commands(self.command_check_parser())
+                client_mongodb.set_command_in_parser_commands(None)
 
     @staticmethod
     def central_processing_of_commands_to_task(command: str, task_name: str):
         if command == CommandsForTask.stop_task:
+            logger.info(f'Остановка таска: {task_name}')
             task_objects = asyncio.all_tasks()
-            print(task_objects)
             task = [task for task in task_objects if task.get_name() == task_name][0]
             task.cancel()
 
@@ -63,7 +59,11 @@ class ReplierEngine:
         self.create_a_task_names()
         list_of_tasks = self.create_tasks_for_replies()
         logger.info(f'Таски для работы: {list_of_tasks}')
-        await asyncio.gather(*list_of_tasks)
+        return list_of_tasks
+
+    @staticmethod
+    async def center_of_start_tasks(tasks: List[Task]):
+        await asyncio.gather(*tasks)
 
     async def central_processing_of_task(self, channel_to_post: str, channel_from_to_get_post: str):
         """
@@ -72,7 +72,6 @@ class ReplierEngine:
         :param channel_from_to_get_post: канал, откуда брать посты
         :return:
         """
-        await asyncio.sleep(10000)
         task = asyncio.current_task()
         task_name = task.get_name()
         while True:
@@ -87,6 +86,7 @@ class ReplierEngine:
                 id_offset = client_mongodb.get_entry(client_mongodb.collection_for_id_offsets, 'task_name', task_name)['id_offset']
                 post = await self.get_post_from_channel(channel_from_to_get_post, message_offset_id=id_offset, offset_date=upper_datetime_limit, reverse=True)
                 logger.debug(post)
+
                 #обновляю id_offset в mongodb
                 client_mongodb.add_data_in_entry(client_mongodb.collection_for_id_offsets, 'id_offset', post.id, 'task_name', task_name)
 
@@ -181,10 +181,41 @@ class ReplierEngine:
 
         return emoji, periodicity
 
+    def command_stop_task(self, command):
+        client_mongodb.set_status_of_work_in_parser_commands('working')
+
+        task_name = client_mongodb.get_data_from_entry_in_parser_commands('task_name')
+        self.central_processing_of_commands_to_task(command, task_name)
+
+        client_mongodb.set_status_of_work_in_parser_commands(None)
+        client_mongodb.set_command_in_parser_commands(None)
+
+    async def command_turn_on_parser(self):
+        task_for_register_a_tasks = asyncio.create_task(self.central_processing_of_register_tasks())
+        await task_for_register_a_tasks
+
+        asyncio.create_task(self.center_of_start_tasks(task_for_register_a_tasks.result()))
+        client_mongodb.set_command_in_parser_commands(None)
+
+    @staticmethod
+    def command_check_parser():
+        channels_to_post_the_posts = client_mongodb.get_channels_url('to')
+        string_for_send_to_user: str = ''
+        running_tasks = [task.get_name() for task in asyncio.all_tasks()]
+        for channel in channels_to_post_the_posts:
+            string_for_send_to_user += channel + ' ' + '->' + ' '
+            for task in running_tasks:
+                if re.search(channel, task):
+                    string_for_send_to_user += '✅︎ Работает\n'
+                    break
+            else:
+                string_for_send_to_user += '❌️ Не работает\n'
+        return string_for_send_to_user
+
 
 def callback_of_work_task(task: asyncio.Task):
     task_name = task.get_name()
-    publisher.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма с канала - {task_name.split("-")[0]}', Queue.callback_queue)
+    publisher.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма\n с канала - {task_name.split("-")[0]}.\nИли один из каналов был удален.', Queue.callback_queue)
 
 
 replier_engine = ReplierEngine(19567654, 'gkadnfnsdkbd')
