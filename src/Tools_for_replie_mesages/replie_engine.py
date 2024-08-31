@@ -16,7 +16,6 @@ from src.Tools_for_replie_mesages.commands_for_tasks import CommandsForTask
 from src.rabbitmq_tools.producer_commands import Commands
 from src.Tools_for_replie_mesages.check_on_tasks import check_on_tasks
 logger = logging.getLogger()
-#TODO: 1. сделать чек работы парсера по конкретным каналам
 
 
 class ReplierEngine:

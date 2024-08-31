@@ -2,6 +2,7 @@ from aiogram import Bot
 from src.databases.mongodb import client_mongodb
 import re
 
+
 async def register_channel_to_post_the_posts(bot: Bot, chat_id: int, data) -> None:
     assert data['url'] != ''
     assert data['periodic'] != ''

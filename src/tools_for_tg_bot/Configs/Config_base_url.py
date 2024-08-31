@@ -3,4 +3,4 @@ from dataclasses import dataclass
 
 @dataclass
 class BaseURL:
-    URL = 'https://5a15-94-25-228-222.ngrok-free.app'
+    URL = 'https://82ce-178-66-156-170.ngrok-free.app'

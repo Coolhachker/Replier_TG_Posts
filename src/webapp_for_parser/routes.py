@@ -8,6 +8,9 @@ from src.databases.mongodb import client_mongodb
 from src.webapp_for_parser.tools_for_regiser_new_channel_in_db import register_channel_from_get_the_posts, register_channel_to_post_the_posts
 from src.webapp_for_parser.tools_for_delete_the_channel import Eraser
 from src.exceptions.castom_exceptions import Exceptions
+from typing import List
+import json
+from tools_for_change_configs_in_channel import change_configs_in_channel
 
 
 async def demo_handler(request: Request):
@@ -26,6 +29,10 @@ async def direction_to_handler(request: Request):
     return FileResponse(Path(__file__).parent.resolve() / 'data_for_webapp/delete_channel_page_to.html')
 
 
+async def direction_to_change_the_settings_in_channel(request: Request):
+    return FileResponse(Path(__file__).parent.resolve() / 'data_for_webapp/page_of_change_the_settings.html')
+
+
 async def check_data_handler(request: Request):
     bot: Bot = request.app["bot"]
 
@@ -42,7 +49,6 @@ async def send_form_handler(request: Request):
         web_app_init_data = safe_parse_webapp_init_data(token=bot.token, init_data=data["_auth"])
     except ValueError:
         return json_response({"ok": False, "err": "Unauthorized"}, status=401)
-
     try:
         if data['direction'] == 'to':
             await register_channel_to_post_the_posts(bot, web_app_init_data.user.id, data)
@@ -60,7 +66,6 @@ async def delete_channel(request: Request):
         web_app_init_data = safe_parse_webapp_init_data(token=bot.token, init_data=data["_auth"])
     except ValueError:
         return json_response({"ok": False, "err": "Unauthorized"}, status=401)
-
     try:
         direction = data['direction']
         channel = data['channel']
@@ -81,6 +86,42 @@ async def get_channels(request: Request):
         web_app_init_data = safe_parse_webapp_init_data(token=bot.token, init_data=data["_auth"])
     except ValueError:
         return json_response({"ok": False, "err": "Unauthorized"}, status=401)
+    channels: List[str] = []
 
-    channels = client_mongodb.get_channels_url(data['direction'])
+    if data['direction'] == 'all':
+        channels += [(channel, 'to') for channel in client_mongodb.get_channels_url('to')]
+        channels += [(channel, 'from') for channel in client_mongodb.get_channels_url('from')]
+    else:
+        channels = client_mongodb.get_channels_url(data['direction'])
+
     return json_response(data={'channels': channels}, status=200)
+
+
+async def get_configs_from_channel(request: Request):
+    bot: Bot = request.app["bot"]
+    data = await request.post()
+    try:
+        web_app_init_data = safe_parse_webapp_init_data(token=bot.token, init_data=data["_auth"])
+    except ValueError:
+        return json_response({"ok": False, "err": "Unauthorized"}, status=401)
+
+    direction = data['direction']
+    channel = data['channel']
+
+    configs = client_mongodb.get_config_of_channel(channel, direction)
+    return json_response({'response': json.dumps(configs)}, status=200)
+
+
+async def change_the_settings_of_the_channel(request: Request):
+    bot: Bot = request.app["bot"]
+    data = await request.post()
+    try:
+        web_app_init_data = safe_parse_webapp_init_data(token=bot.token, init_data=data["_auth"])
+    except ValueError:
+        return json_response({"ok": False, "err": "Unauthorized"}, status=401)
+
+    change_configs_in_channel(data['url_of_channel'], data['direction'], data)
+
+    await bot.send_message(web_app_init_data.user.id, f'✅︎ успешное изменение параметров в канале:\n-> {data["url_of_channel"]}')
+
+    return json_response({'status': 'ok'}, status=200)

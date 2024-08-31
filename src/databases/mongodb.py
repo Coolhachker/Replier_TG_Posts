@@ -112,11 +112,10 @@ class MongoDBClient:
         for element in data_from_db:
             return element[channel_url]['emoji']
 
-    @lru_cache
-    def get_config_of_channel(self, channel: str, direction: str) -> dict:
+    def get_config_of_channel(self, channel: str, direction: str, with_channel: bool = False) -> dict:
         entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)[direction]
         index_channel = [key for obj in entry for key in obj.keys()].index(channel)
-        return entry[index_channel][channel]
+        return entry[index_channel][channel] if with_channel is False else entry[index_channel]
 
     @staticmethod
     def delete_entry(collection: Collection, uniq_key: str, uniq_value: Union[str, int]):

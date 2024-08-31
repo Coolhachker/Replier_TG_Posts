@@ -6,6 +6,7 @@ from src.tools_for_tg_bot.buttons.add_or_delete_channels_merkup import add_or_de
 from src.tools_for_tg_bot.Configs.callbacks_configs import CallbacksNames
 from src.tools_for_tg_bot.buttons.webapp_on_add_channel import button_on_add_channel
 from src.tools_for_tg_bot.buttons.webapp_on_delete_channel import button_on_delete_channel
+from src.tools_for_tg_bot.buttons.webapp_on_change_parameters import button_on_change_param
 
 
 def callbacks(dispatcher: Dispatcher, bot: Bot):
@@ -35,3 +36,7 @@ def callbacks(dispatcher: Dispatcher, bot: Bot):
     @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.delete_channel)
     async def callback_on_delete_channel(cq: CallbackQuery):
         await bot.send_message(cq.message.chat.id, 'Нажмите на кнопку для продолжения действия.', reply_markup=button_on_delete_channel())
+
+    @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.change_parameters)
+    async def callback_on_change_parameters(cq: CallbackQuery):
+        await bot.send_message(cq.message.chat.id, 'Нажмите на кнопку для продолжения действия.', reply_markup=button_on_change_param())
