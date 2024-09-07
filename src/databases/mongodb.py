@@ -2,8 +2,8 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from src.exceptions.castom_exceptions import Exceptions
 from typing import Union
-from functools import lru_cache
 from typing import Any
+from src.tools_for_tg_bot.Configs.hosts import Hosts
 # Образец коллекции "collection_for_parser_configs"
 # {
 #     "from": [
@@ -32,13 +32,16 @@ from typing import Any
 
 class MongoDBClient:
     def __init__(self):
-        connection_string = 'mongodb://127.0.0.1:27017/'
+        connection_string = f'mongodb://{Hosts.mongodb}:27017/'
         self.client = MongoClient(connection_string)
         self.uniq_key = 1234567890
         self.collection_for_parser_configs = self.client['replies_config_collection']['collection_for_parser_configs']
         self.collection_for_bot_configs = self.client['replies_config_collection']['collection_for_bot_configs']
         self.collection_for_id_offsets = self.client['replies_config_collection']['collection_for_id_offsets']
         self.collection_for_parser_commands = self.client['replies_config_collection']['collection_for_parser_commands']
+
+        self.register_entry_channels_config()
+        self.set_command_entry()
 
     def register_entry_channels_config(self):
         data = {

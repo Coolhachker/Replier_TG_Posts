@@ -40,3 +40,7 @@ def callbacks(dispatcher: Dispatcher, bot: Bot):
     @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.change_parameters)
     async def callback_on_change_parameters(cq: CallbackQuery):
         await bot.send_message(cq.message.chat.id, 'Нажмите на кнопку для продолжения действия.', reply_markup=button_on_change_param())
+
+    @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.get_channels)
+    async def callback_on_get_channels(cq: CallbackQuery):
+        pass

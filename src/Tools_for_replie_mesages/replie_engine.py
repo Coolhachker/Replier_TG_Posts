@@ -14,7 +14,9 @@ from src.rabbitmq_tools.publish_a_message import publisher
 from src.rabbitmq_tools.queue_dataclass import Queue
 from src.Tools_for_replie_mesages.commands_for_tasks import CommandsForTask
 from src.rabbitmq_tools.producer_commands import Commands
-from src.Tools_for_replie_mesages.check_on_tasks import check_on_tasks
+from asyncio import Semaphore
+from src.Tools_for_replie_mesages.check_parser import command_check_parser
+from functools import lru_cache
 logger = logging.getLogger()
 
 
@@ -39,7 +41,7 @@ class ReplierEngine:
             elif command == CommandsForTask.stop_task:
                 self.command_stop_task(command)
             elif command == Commands.CHECK_PARSER_COMMAND:
-                client_mongodb.set_status_of_work_in_parser_commands(self.command_check_parser())
+                client_mongodb.set_status_of_work_in_parser_commands(command_check_parser())
                 client_mongodb.set_command_in_parser_commands(None)
 
     @staticmethod
@@ -50,61 +52,33 @@ class ReplierEngine:
             task = [task for task in task_objects if task.get_name() == task_name][0]
             task.cancel()
 
-    async def central_processing_of_register_tasks(self):
+    async def central_processing_of_register_tasks(self, channels_to_post_the_posts: List[str]):
         """
         Центральный процесс регистрации новых тасков, вызывается извне.
         :return:
         """
-        self.create_a_task_names()
+        self.create_a_task_names(channels_to_post_the_posts)
         list_of_tasks = self.create_tasks_for_replies()
         logger.info(f'Таски для работы: {list_of_tasks}')
         return list_of_tasks
 
     @staticmethod
     async def center_of_start_tasks(tasks: List[Task]):
-        await asyncio.gather(*tasks)
+        await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def central_processing_of_task(self, channel_to_post: str, channel_from_to_get_post: str):
+    async def central_processing_of_task(self, channel_to_post: str, channel_from_to_get_post: str, semaphore: Semaphore):
         """
         Центральный процесс работы таска, он координирует работу методов по работе с постами.
         :param channel_to_post: канал, куда сбывать посты
         :param channel_from_to_get_post: канал, откуда брать посты
+        :param semaphore: объект asyncio.Semaphore, чтобы регулировать работу тасков
         :return:
         """
         task = asyncio.current_task()
         task_name = task.get_name()
         while True:
-            try:
-                # получаю динамически конфиги
-                data_from_configs_of_channels_from_get_posts = client_mongodb.get_config_of_channel(channel_from_to_get_post, 'from')
-                data_from_configs_of_channels_to_post_posts = client_mongodb.get_config_of_channel(channel_to_post, 'to')
-
-                upper_datetime_limit, lower_datetime_limit, video_or_photo, morning_post = self.unpack_config_with_key_FROM(data_from_configs_of_channels_from_get_posts)
-                emoji, periodicity = self.unpack_config_with_key_TO(data_from_configs_of_channels_to_post_posts)
-
-                id_offset = client_mongodb.get_entry(client_mongodb.collection_for_id_offsets, 'task_name', task_name)['id_offset']
-                post = await self.get_post_from_channel(channel_from_to_get_post, message_offset_id=id_offset, offset_date=upper_datetime_limit, reverse=True)
-                logger.debug(post)
-
-                #обновляю id_offset в mongodb
-                client_mongodb.add_data_in_entry(client_mongodb.collection_for_id_offsets, 'id_offset', post.id, 'task_name', task_name)
-
-                await check_post(post, self.client_session, channel_to_post)
-
-                #обработка поста
-                data_for_send_in_channels = await processing(self.client_session, post, video_or_photo, channel_to_post, emoji, lower_datetime_limit, morning_post)
-
-                logger.debug(data_for_send_in_channels)
-                await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)
-                await asyncio.sleep(periodicity)
-            except Exceptions.ExceptionOnUnsuitablePost as _ex:
-                logger.error('Поймал некритичную ошибку: ', exc_info=_ex)
-                continue
-            except Exceptions.ExceptionOnDateOfPost as _ex:
-                logger.info('Таск отработал свое время')
-                break
-            except Exception as _ex:
-                logger.critical('Получил критическую ошибку: ', exc_info=_ex)
+            async with semaphore:
+                await self.process_of_the_replier_on_channel(channel_from_to_get_post, channel_to_post, task_name)
 
     async def send_post_in_channel(self, channel_to_post: str, data_for_post: dict) -> None:
         """
@@ -129,13 +103,13 @@ class ReplierEngine:
         post = await self.client_session.get_messages(channel_from_to_get_post, offset_date=offset_date, reverse=reverse, offset_id=message_offset_id, limit=1)
         return post[0]
 
-    def create_a_task_names(self):
+    def create_a_task_names(self, channels: List[str]):
         """
         Создание имен для тасков.
         :return:
         """
         logger.info('Создание имен тасков')
-        for channel_to in self.channels_to_posts_the_posts:
+        for channel_to in channels:
             for channel_from in self.channels_from_get_the_posts:
                 if f'{channel_from}-{channel_to}' not in self.task_names:
                     client_mongodb.add_data_in_entry(client_mongodb.collection_for_parser_configs, 'task_names', f'{channel_from}-{channel_to}', 'uniq_key', client_mongodb.uniq_key)
@@ -155,7 +129,7 @@ class ReplierEngine:
         for task in self.task_names:
             if task not in tasks_running:
                 channel_from, channel_to = task.split('-')[0], task.split('-')[1]
-                task_for_replier = asyncio.create_task(self.central_processing_of_task(channel_to, channel_from), name=task)
+                task_for_replier = asyncio.create_task(self.central_processing_of_task(channel_to, channel_from, return_the_semaphores(channel_to)), name=task)
                 task_for_replier.add_done_callback(callback_of_work_task)
                 tasks_waiting.append(task_for_replier)
                 client_mongodb.register_entry_in_collection_for_id_offsets(task)
@@ -190,26 +164,45 @@ class ReplierEngine:
         client_mongodb.set_command_in_parser_commands(None)
 
     async def command_turn_on_parser(self):
-        task_for_register_a_tasks = asyncio.create_task(self.central_processing_of_register_tasks())
+        task_for_register_a_tasks = asyncio.create_task(self.central_processing_of_register_tasks(self.channels_to_posts_the_posts))
         await task_for_register_a_tasks
 
         asyncio.create_task(self.center_of_start_tasks(task_for_register_a_tasks.result()))
         client_mongodb.set_command_in_parser_commands(None)
 
-    @staticmethod
-    def command_check_parser():
-        channels_to_post_the_posts = client_mongodb.get_channels_url('to')
-        string_for_send_to_user: str = ''
-        running_tasks = [task.get_name() for task in asyncio.all_tasks()]
-        for channel in channels_to_post_the_posts:
-            string_for_send_to_user += channel + ' ' + '->' + ' '
-            for task in running_tasks:
-                if re.search(channel, task):
-                    string_for_send_to_user += '✅︎ Работает\n'
-                    break
-            else:
-                string_for_send_to_user += '❌️ Не работает\n'
-        return string_for_send_to_user
+    async def process_of_the_replier_on_channel(self, channel_from_to_get_post: str, channel_to_post: str, task_name: str):
+        try:
+            logger.info(f'Работает таск по имени: {task_name}')
+            # получаю динамически конфиги
+            data_from_configs_of_channels_from_get_posts = client_mongodb.get_config_of_channel(channel_from_to_get_post, 'from')
+            data_from_configs_of_channels_to_post_posts = client_mongodb.get_config_of_channel(channel_to_post, 'to')
+
+            upper_datetime_limit, lower_datetime_limit, video_or_photo, morning_post = self.unpack_config_with_key_FROM(data_from_configs_of_channels_from_get_posts)
+            emoji, periodicity = self.unpack_config_with_key_TO(data_from_configs_of_channels_to_post_posts)
+
+            id_offset = client_mongodb.get_entry(client_mongodb.collection_for_id_offsets, 'task_name', task_name)['id_offset']
+            post = await self.get_post_from_channel(channel_from_to_get_post, message_offset_id=id_offset, offset_date=upper_datetime_limit, reverse=True)
+            logger.debug(post)
+
+            # обновляю id_offset в mongodb
+            client_mongodb.add_data_in_entry(client_mongodb.collection_for_id_offsets, 'id_offset', post.id, 'task_name', task_name)
+
+            await check_post(post, self.client_session, channel_to_post)
+
+            # обработка поста
+            data_for_send_in_channels = await processing(self.client_session, post, video_or_photo, channel_to_post, emoji, lower_datetime_limit, morning_post)
+
+            logger.debug(data_for_send_in_channels)
+            await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)
+            await asyncio.sleep(periodicity)
+            logger.debug(f'Ушел спать {task_name}')
+        except Exceptions.ExceptionOnUnsuitablePost as _ex:
+            logger.error('Поймал некритичную ошибку: ', exc_info=_ex)
+        except Exceptions.ExceptionOnDateOfPost as _ex:
+            logger.info('Таск отработал свое время')
+            raise Exception('break circle')
+        except Exception as _ex:
+            logger.critical('Получил критическую ошибку: ', exc_info=_ex)
 
 
 def callback_of_work_task(task: asyncio.Task):
@@ -217,4 +210,9 @@ def callback_of_work_task(task: asyncio.Task):
     publisher.publish(f'[INFO]: Канал - {task_name.split("-")[1]} получил все посты с датафрейма\n с канала - {task_name.split("-")[0]}.\nИли один из каналов был удален.', Queue.callback_queue)
 
 
-replier_engine = ReplierEngine(19567654, 'gkadnfnsdkbd')
+@lru_cache
+def return_the_semaphores(channel_to: str) -> Semaphore:
+    return Semaphore(1)
+
+
+replier_engine = ReplierEngine(19567654, '7ec7d44a4889e041dd667dc760b323e1')

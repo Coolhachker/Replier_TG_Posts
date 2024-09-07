@@ -10,7 +10,7 @@ from src.webapp_for_parser.tools_for_delete_the_channel import Eraser
 from src.exceptions.castom_exceptions import Exceptions
 from typing import List
 import json
-from tools_for_change_configs_in_channel import change_configs_in_channel
+from src.webapp_for_parser.tools_for_change_configs_in_channel import change_configs_in_channel
 
 
 async def demo_handler(request: Request):

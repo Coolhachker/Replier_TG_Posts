@@ -1,0 +1,97 @@
+services:
+  bot:
+    build:
+      dockerfile: ./Dockerfile_bot
+    image: bot:latest
+    ports:
+      - 127.0.0.1:8081:8081
+    networks:
+      back:
+        ipv4_address: 172.16.235.5
+      default:
+    volumes:
+      - ./:/bot:./
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+        restart: true
+      mongo_db:
+        condition: service_started
+      rabbitmq_container:
+        condition: service_started
+    restart: unless-stopped
+
+
+  parser:
+    build:
+      dockerfile: ./Dockerfile_replier
+    image: parser:latest
+    ports:
+      - 455:455
+    volumes:
+      - ./:/replier:./
+    networks:
+      back:
+        ipv4_address: 172.16.235.6
+      default:
+
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+        restart: true
+      mongo_db:
+        condition: service_started
+      rabbitmq_container:
+        condition: service_started
+      bot:
+        condition: service_started
+    restart: unless-stopped
+
+
+
+  mysql_db:
+    image: mysql:latest
+    networks:
+      back:
+        ipv4_address: 172.16.235.2
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234567890
+      MYSQL_HOST: bot_of_vk_activity-mysql_bd-1
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      start_period: 30s
+      interval: 10s
+      timeout: 20s
+      retries: 5
+    restart: unless-stopped
+
+
+
+  mongo_db:
+    image: mongo:latest
+    networks:
+      back:
+        ipv4_address: 172.16.235.3
+    restart: unless-stopped
+
+
+
+  rabbitmq_container:
+    image: rabbitmq:latest
+    networks:
+      back:
+        ipv4_address: 172.16.235.7
+    restart: unless-stopped
+
+
+
+networks:
+  back:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.235.0/24
+  default:
+    driver: bridge

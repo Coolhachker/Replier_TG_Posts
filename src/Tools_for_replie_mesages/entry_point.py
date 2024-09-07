@@ -5,7 +5,7 @@ import logging
 from logging import basicConfig
 from src.rabbitmq_tools.producer_commands import Commands
 
-basicConfig(filename='../../data/replier.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
+basicConfig(filename='data/replier.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
 logger = logging.getLogger()
 
 

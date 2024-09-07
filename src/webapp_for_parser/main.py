@@ -12,6 +12,9 @@ from aiogram import Bot
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from src.tools_for_tg_bot.Configs.Config_base_url import BaseURL
 import asyncio
+from logging import basicConfig
+import logging
+basicConfig(filename='data/bot.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
 
 
 TOKEN = '6356385807:AAHWycJ5m7jykCVRcDCWUa3BvFL_oRlou5k'
@@ -55,7 +58,7 @@ class WebApp:
 
     async def run_app(self):
         await self.replier_bot.start_pooling()
-        await _run_app(self.app, host="127.0.0.1", port=8081)
+        await _run_app(self.app, host="0.0.0.0", port=8081)
 
 
 if __name__ == '__main__':

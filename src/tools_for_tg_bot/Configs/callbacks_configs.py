@@ -10,3 +10,6 @@ class CallbacksNames:
     change_parameters: str = 'change_parameters'
     add_channel: str = 'add_channel'
     delete_channel: str = 'delete_channel'
+    get_channels: str = 'get_channels'
+    turn_on_channel: str = 'turn_on_channel'
+    turn_off_channel: str = 'turn_off_channel'

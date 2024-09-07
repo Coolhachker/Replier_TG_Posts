@@ -3,6 +3,7 @@ from functools import lru_cache
 from mysql.connector import connect
 import mysql
 import logging
+from src.tools_for_tg_bot.Configs.hosts import Hosts
 logger = logging.getLogger()
 
 
@@ -14,7 +15,7 @@ class MysqlDB:
     def connect_to_db(self):
         try:
             connection = connect(
-                host='localhost',
+                host=Hosts.mysql_db,
                 user='root',
                 password='root1234567890',
                 auth_plugin='mysql_native_password',
@@ -24,7 +25,7 @@ class MysqlDB:
             return connection, connection.cursor(buffered=True)
         except mysql.connector.errors.ProgrammingError:
             connection = connect(
-                host='localhost',
+                host=Hosts.mysql_db,
                 user='root',
                 password='root1234567890',
                 auth_plugin='mysql_native_password',

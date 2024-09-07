@@ -1,0 +1,15 @@
+FROM ubuntu:latest
+FROM python:3.9-slim
+
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /bot
+COPY . /bot
+
+EXPOSE 8081
+EXPOSE 5672
+
+RUN python3 -m venv venv && source venv/bin/activate
+RUN pip3 install -r requirements.txt
+
+CMD python3 -m src.webapp_for_parser.main
