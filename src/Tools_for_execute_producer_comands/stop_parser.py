@@ -1,5 +1,6 @@
 from src.databases.mongodb import client_mongodb
-import subprocess
+# import subprocess
+import os
 
 
 def stop_parser():
@@ -9,4 +10,5 @@ def stop_parser():
     else:
         client_mongodb.update_pid_of_parser(None)
         client_mongodb.update_status_of_parser('OK: Парсер не работает :(')
-        subprocess.run(['killall', str(parser_process)])
+        os.system(f'kill {parser_process}')
+        # subprocess.run(['pkill', str(parser_process)])

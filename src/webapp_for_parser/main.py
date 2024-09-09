@@ -17,9 +17,6 @@ import logging
 basicConfig(filename='data/bot.log', filemode='w', level=logging.DEBUG, format='[%(levelname)s] - %(funcName)s - %(message)s')
 
 
-TOKEN = '6356385807:AAHWycJ5m7jykCVRcDCWUa3BvFL_oRlou5k'
-
-
 async def on_startup(bot: Bot, base_url: str):
     await bot.set_webhook(f"{base_url}/webhook")
 

@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import re
 from asyncio import Task
 from telethon import TelegramClient
 from src.databases.mongodb import client_mongodb
@@ -38,11 +37,16 @@ class ReplierEngine:
                 await asyncio.sleep(1)
             elif command == Commands.TURN_ON_COMMAND:
                 await asyncio.create_task(self.command_turn_on_parser())
-            elif command == CommandsForTask.stop_task:
-                self.command_stop_task(command)
-            elif command == Commands.CHECK_PARSER_COMMAND:
+            elif command == Commands.CHECK_PARSER_COMMAND or Commands.GET_CHANNELS_COMMAND:
                 client_mongodb.set_status_of_work_in_parser_commands(command_check_parser())
                 client_mongodb.set_command_in_parser_commands(None)
+
+            if command == CommandsForTask.stop_task:
+                logger.info('Останавливаю таск уровень 2')
+                self.command_stop_task(command)
+            elif command == CommandsForTask.start_task:
+                logger.info('Запускаю таск уровень 2')
+                asyncio.create_task(self.command_start_channel())
 
     @staticmethod
     def central_processing_of_commands_to_task(command: str, task_name: str):
@@ -170,6 +174,15 @@ class ReplierEngine:
         asyncio.create_task(self.center_of_start_tasks(task_for_register_a_tasks.result()))
         client_mongodb.set_command_in_parser_commands(None)
 
+    async def command_start_channel(self):
+        channel = client_mongodb.get_data_from_entry_in_parser_commands('task_name')
+        task_of_channel = asyncio.create_task(self.central_processing_of_register_tasks([channel]))
+        await task_of_channel
+
+        asyncio.create_task(self.center_of_start_tasks(task_of_channel.result()))
+        client_mongodb.set_task_name_in_parser_commands(None)
+        client_mongodb.set_command_in_parser_commands(None)
+
     async def process_of_the_replier_on_channel(self, channel_from_to_get_post: str, channel_to_post: str, task_name: str):
         try:
             logger.info(f'Работает таск по имени: {task_name}')
@@ -194,8 +207,8 @@ class ReplierEngine:
 
             logger.debug(data_for_send_in_channels)
             await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)
-            await asyncio.sleep(periodicity)
             logger.debug(f'Ушел спать {task_name}')
+            await asyncio.sleep(periodicity)
         except Exceptions.ExceptionOnUnsuitablePost as _ex:
             logger.error('Поймал некритичную ошибку: ', exc_info=_ex)
         except Exceptions.ExceptionOnDateOfPost as _ex:

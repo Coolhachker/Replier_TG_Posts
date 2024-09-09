@@ -17,7 +17,7 @@ def actions_markup() -> InlineKeyboardMarkup:
     keyboard.row(check_parser_button)
     keyboard.row(add_or_delete_channels_button)
     keyboard.row(change_parameters_in_configs_button)
-    # keyboard.row(channels_list_button)
+    keyboard.row(channels_list_button)
 
     return keyboard.as_markup()
 

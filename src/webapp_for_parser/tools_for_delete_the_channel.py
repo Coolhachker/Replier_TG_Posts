@@ -1,8 +1,6 @@
 import json
-
 from src.databases.mongodb import client_mongodb
 from src.rabbitmq_tools.producer_commands import Commands
-from src.rabbitmq_tools.producer import producer
 import re
 from typing import List
 from src.Tools_for_replie_mesages.commands_for_tasks import CommandsForTask
@@ -16,15 +14,18 @@ class Eraser:
 
     def start_erase(self):
         if self.check_on_performance():
-            task_names: List[str] = [task_name for task_name in client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['task_names'] if re.search(self.channel, task_name)]
-            data_for_send = {'command': CommandsForTask.stop_task,
-                             'task_names': task_names}
-
-            result = producer.publish(json.dumps(data_for_send), queue=producer.parser_tasks_queue)
+            self.stop_task()
 
         self.delete_the_entry_in_offset_id_collection()
         self.delete_channel_from_task_names()
         self.delete_channel_from_directions()
+
+    def stop_task(self):
+        task_names: List[str] = [task_name for task_name in client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['task_names'] if re.search(self.channel, task_name)]
+        data_for_send = {'command': CommandsForTask.stop_task, 'task_names': task_names}
+
+        result = producer.publish(json.dumps(data_for_send), queue=producer.parser_tasks_queue)
+        return result
 
     def delete_the_entry_in_offset_id_collection(self):
         task_names: List[str] = [task_name for task_name in client_mongodb.get_entry(client_mongodb.collection_for_parser_configs, 'uniq_key', client_mongodb.uniq_key)['task_names'] if re.search(self.channel, task_name)]

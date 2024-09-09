@@ -31,6 +31,7 @@ class Producer:
         self.channel.queue_declare(queue=self.parser_tasks_queue, durable=True)
 
     def publish(self, message: Any, properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent), queue=None, callback_queue=None):
+        properties = pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent, reply_to=self.callback_queue)
         try:
             self.channel.basic_publish(
                 exchange=self.exchange,

@@ -1,5 +1,4 @@
 import datetime
-
 from src.databases.mongodb import client_mongodb
 from telethon.types import Message
 from telethon import TelegramClient
@@ -8,6 +7,8 @@ from src.exceptions.castom_exceptions import Exceptions
 from typing import List
 from typing import Union
 from functools import lru_cache
+from logging import getLogger
+logger = getLogger()
 
 
 async def processing(
@@ -32,6 +33,7 @@ async def processing(
     :return: словарь из данных
     """
     dict_of_data: dict = {}
+    logger.debug(f'Обрабатываю пост: {post}')
     mime_type: str = post.media.document.mime_type.split('/')[0]
     message_text: str = post.message
     if check_post_on_media(mime_type, photo_or_video) and check_post_on_advert(message_text) and check_on_date(post.date.timestamp(), lower_limit_timestamp_in_config):

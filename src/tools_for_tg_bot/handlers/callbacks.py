@@ -1,3 +1,5 @@
+import asyncio
+import re
 from aiogram import Dispatcher, Bot
 from aiogram.types import CallbackQuery
 from src.rabbitmq_tools.producer import producer
@@ -7,6 +9,11 @@ from src.tools_for_tg_bot.Configs.callbacks_configs import CallbacksNames
 from src.tools_for_tg_bot.buttons.webapp_on_add_channel import button_on_add_channel
 from src.tools_for_tg_bot.buttons.webapp_on_delete_channel import button_on_delete_channel
 from src.tools_for_tg_bot.buttons.webapp_on_change_parameters import button_on_change_param
+from src.tools_for_tg_bot.buttons.channels_markup import set_channels_markup
+from src.webapp_for_parser.tools_for_delete_the_channel import Eraser
+from src.webapp_for_parser.tools_for_start_channel import start_channel
+import logging
+logger = logging.getLogger()
 
 
 def callbacks(dispatcher: Dispatcher, bot: Bot):
@@ -43,4 +50,23 @@ def callbacks(dispatcher: Dispatcher, bot: Bot):
 
     @dispatcher.callback_query(lambda cq: cq.data == CallbacksNames.get_channels)
     async def callback_on_get_channels(cq: CallbackQuery):
-        pass
+        result = producer.publish(Commands.GET_CHANNELS_COMMAND)
+        logger.debug(f'Список чатов: {result}')
+        await bot.send_message(cq.message.chat.id, 'ℹ️ Этот раздел посвящен остановке или включению каналов в системе.\nЕсли вам нужно остановить канал, у которого стоит напротив галочка - ✅︎, то нажмите на него.\nОбратно если хотите включить канал.', reply_markup=set_channels_markup(result))
+
+    @dispatcher.callback_query(lambda cq: re.search(CallbacksNames.turn_off_channel, cq.data))
+    async def turn_off_channel_callback(cq: CallbackQuery):
+        channel = 'https://t.me/' + cq.data.split('-', maxsplit=1)[1]
+        eraser = Eraser(channel, 'to')
+        result = eraser.stop_task()
+        # await bot.send_message(cq.message.chat.id, result)
+
+    @dispatcher.callback_query(lambda cq: re.search(CallbacksNames.turn_on_channel, cq.data))
+    async def turn_on_callback(cq: CallbackQuery):
+        channel = 'https://t.me/' + cq.data.split('-', maxsplit=1)[1]
+        logger.debug(f'Выбранный канал для включения в системе: {channel}')
+        result = start_channel(channel)
+        await bot.send_message(cq.message.chat.id, result)
+
+
+
