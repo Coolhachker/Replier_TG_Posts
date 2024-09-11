@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="MobileOptimized" content="176"/>
+    <meta name="HandheldFriendly" content="True"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <title>Channel Selection Form</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?1"></script>
+    <script src="https://webappcontent.telegram.org/js/jquery.min.js"></script>
+    <script>
+        Telegram.WebApp.ready();
+
+        var initData = Telegram.WebApp.initData || '';
+        var initDataUnsafe = Telegram.WebApp.initDataUnsafe || {};
+
+        document.addEventListener("DOMContentLoaded", () => {
+            $.ajax('/channel/get_channels', {
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    direction: 'all',
+                    _auth: initData
+                    },
+                success: function (result) {
+                    for (channel of result.channels){
+                         localStorage.setItem(channel[0], channel[1]);
+                        addChannelToList(channel[0]);
+                    }
+                },
+                error: function(xhr) {
+                    alert('server error');
+                }
+            });
+        });
+
+        function submitFROM() {
+            const channel = document.getElementById('channel-select').value;
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+            const videoOrPhoto = document.getElementById('video-of-photo').value;
+            const morningPost = document.getElementById('morning-post').value;
+
+            let data = {
+                direction: 'from',
+                url_of_channel: channel,
+                time_from: dateFrom,
+                time_to: dateTo,
+                video_or_photo: videoOrPhoto,
+                morning_post: morningPost,
+                _auth: initData,
+                msg_id: '',
+                with_webview: 0
+            };
+
+            SendMessage(data);
+
+        };
+        function submitTo() {
+            const channel = document.getElementById('channel-select').value;
+            const periodicity = document.getElementById('frequency').value;
+            const emoji = document.getElementById('emoji').value
+
+            let data = {
+                direction: 'to',
+                url_of_channel: channel,
+                periodicity: periodicity,
+                emoji: emoji,
+                _auth: initData,
+                msg_id: '',
+                with_webview: 0
+            }
+
+            SendMessage(data);
+
+        }
+        function addChannelToList(channelName) {
+            const option = document.createElement('option');
+            option.value = channelName;
+            option.textContent = channelName;
+            document.getElementById('channel-select').appendChild(option);
+        };
+
+        function webviewClose() {
+            Telegram.WebApp.close();
+        };
+        function toggleForms() {
+            const channel = document.getElementById('channel-select').value;
+            var direction_of_channel = localStorage.getItem(channel);
+            console.log(direction_of_channel);
+            SendRequestForGetConfigsOfChannel(direction_of_channel, channel);
+
+            document.getElementById('from-form').style.display = direction_of_channel == 'from' ? 'block' : 'none';
+            document.getElementById('to-form').style.display = direction_of_channel == 'to' ? 'block' : 'none';
+        }
+        function SendRequestForGetConfigsOfChannel(direction, channel) {
+            $.ajax('/channel/get_configs_of_channel', {
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        direction: direction,
+                        _auth: initData,
+                        channel: channel
+                    },
+                    cache: false,
+                    success: function(result) {
+                        response = JSON.parse(result.response);
+                        if (direction == 'from') {
+                            document.getElementById('date-from-sheet').value = response['time_from'];
+                            document.getElementById('date-to-sheet').value = response['time_to'];
+                            document.getElementById('video-of-photo-sheet').value = response['video_or_photo'];
+                            document.getElementById('morning-post-sheet').value = response['morning_post'];
+                        };
+                        if (direction == 'to') {
+                            document.getElementById('frequency-sheet').value = response['periodicity'];
+                            document.getElementById('emoji-sheet').value = response['emoji'];
+                        }
+                    },
+                    error: function(xhr){
+                        alert('Server error');
+                        webviewClose();
+                    }
+                });
+
+        }
+        function SendMessage(data_of_channel) {
+            $.ajax('/channel/ChangeRequest', {
+                type: "POST",
+                dataType: 'json',
+                data: data_of_channel,
+                success: function(result) {
+                    alert('Успешное изменение!')
+                },
+                error: function(xhr) {
+                    alert("Server error!")
+                }
+            });
+            webviewClose()
+        }
+
+
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"], select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[readonly]{
+            background-color: #c8c8c8;
+        }
+        .form-section {
+            display: none;
+        }
+        .hint {
+            font-size: .8em;
+            color: var(--tg-theme-hint-color, #a8a8a8);
+        }
+        .ok {
+            color: green;
+        }
+
+        .err {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Выберите канал</h1>
+    <div class="form-group">
+        <label for="channel-select">Choose a channel:</label>
+        <select id="channel-select" onchange="toggleForms()">
+            <option value="">Select...</option>
+        </select>
+    </div>
+
+    <div id="from-form" class="form-section">
+        <h2>ПАРАМЕТРЫ КАНАЛА ОТКУДА БРАТЬ ПОСТЫ</h2>
+        <div class="form-group">
+            <label for="date-from-sheet">ORIGIN Верхняя граница времени:</label>
+            <input type="text" id="date-from-sheet" readonly>
+        </div>
+        <div class="form-group">
+            <label for="date-from">Верхняя граница времени:</label>
+            <input type="date" id="date-from" required>
+        </div>
+        <div class="form-group">
+            <label for="date-to-sheet">ORGIN Нижняя граница времени:</label>
+            <input type="text" id="date-to-sheet" readonly>
+        </div>
+        <div class="form-group">
+            <label for="date-to">Нижняя граница времени:</label>
+            <input type="date" id="date-to" required>
+        </div>
+        <div class="form-group">
+            <label for="video-of-photo-sheet">ORIGIN Video or Photo:</label>
+            <input type="text" id="video-of-photo-sheet" readonly>
+        </div>
+        <div class="form-group">
+            <label for="video-of-photo">Video or Photo:</label>
+            <select id="video-of-photo" required>
+                <option value="">Выберите вариант:</option>
+                <option value="video">Video</option>
+                <option value="photo">Photo</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="morning-post-sheet">ORIGIN Утренний пост:</label>
+            <input type="text" id="morning-post-sheet" readonly>
+        </div>
+        <div class="form-group">
+            <label for="morning-post">Утренний пост:</label>
+            <select id="morning-post" required>
+                <option value="">Выберите вариант:</option>
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <button onclick="submitFROM()">Подтвердить</button>
+    </div>
+
+    <div id="to-form" class="form-section">
+        <h2>ПАРАМЕТРЫ КАНАЛА КУДА СБЫВАТЬ ПОСТЫ</h2>
+        <div class="form-group">
+            <label for="frequency-sheet">ORIGIN Периодичность</label>
+            <input type="text" id="frequency-sheet" readonly>
+        </div>
+        <div class="form-group">
+            <label for="frequency">Периодичность</label>
+            <input onkeydown="clear_keyboard(event.key, 'frequency')" type="text" id="frequency" placeholder="периодичность" required>
+        </div>
+        <div class="form-group">
+            <label for="emoji-sheet">ORIGIN Emoji:</label>
+            <input type="text" id="emoji-sheet" readonly>
+        </div>
+        <div class="form-group">
+            <label for="emoji">Emoji:</label>
+            <input onkeydown="clear_keyboard(event.key, 'emoji')" type="text" id="emoji" placeholder="Enter emoji" required>
+        </div>
+        <button onclick="submitTo()">Подтвердить</button>
+    </div>
+    <div class="message" id="message"></div>
+</div>
+
+</body>
+</html>

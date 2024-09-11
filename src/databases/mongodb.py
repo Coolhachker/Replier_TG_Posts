@@ -2,8 +2,8 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from src.exceptions.castom_exceptions import Exceptions
 from typing import Union
-from functools import lru_cache
 from typing import Any
+from src.tools_for_tg_bot.Configs.hosts import Hosts
 # Образец коллекции "collection_for_parser_configs"
 # {
 #     "from": [
@@ -32,12 +32,16 @@ from typing import Any
 
 class MongoDBClient:
     def __init__(self):
-        connection_string = 'mongodb://127.0.0.1:27017/'
+        connection_string = f'mongodb://{Hosts.mongodb}:27017/'
         self.client = MongoClient(connection_string)
         self.uniq_key = 1234567890
         self.collection_for_parser_configs = self.client['replies_config_collection']['collection_for_parser_configs']
         self.collection_for_bot_configs = self.client['replies_config_collection']['collection_for_bot_configs']
         self.collection_for_id_offsets = self.client['replies_config_collection']['collection_for_id_offsets']
+        self.collection_for_parser_commands = self.client['replies_config_collection']['collection_for_parser_commands']
+
+        self.register_entry_channels_config()
+        self.set_command_entry()
 
     def register_entry_channels_config(self):
         data = {
@@ -67,11 +71,14 @@ class MongoDBClient:
         else:
             pass
 
-    def add_data_in_entry(self, collection: Collection, key: str, data: Any, uniq_key: str, uniq_value: Union[str, int]):
+    def add_data_in_entry(self, collection: Collection, key: str, data: Any, uniq_key: str, uniq_value: Union[str, int], update_data_in_entry: bool = False):
         entry = self.get_entry(collection, uniq_key, uniq_value)
         data_from_db = entry[key]
         if type(data_from_db) is list:
-            data_from_db.append(data)
+            if update_data_in_entry is False:
+                data_from_db.append(data)
+            else:
+                data_from_db = data
         else:
             data_from_db = data
 
@@ -108,11 +115,10 @@ class MongoDBClient:
         for element in data_from_db:
             return element[channel_url]['emoji']
 
-    @lru_cache
-    def get_config_of_channel(self, channel: str, direction: str) -> dict:
+    def get_config_of_channel(self, channel: str, direction: str, with_channel: bool = False) -> dict:
         entry = self.get_entry(self.collection_for_parser_configs, 'uniq_key', self.uniq_key)[direction]
         index_channel = [key for obj in entry for key in obj.keys()].index(channel)
-        return entry[index_channel][channel]
+        return entry[index_channel][channel] if with_channel is False else entry[index_channel]
 
     @staticmethod
     def delete_entry(collection: Collection, uniq_key: str, uniq_value: Union[str, int]):
@@ -130,6 +136,31 @@ class MongoDBClient:
 
     def update_pid_of_parser(self, process_parser):
         self.add_data_in_entry(self.collection_for_parser_configs, 'pid_of_parser', process_parser, 'uniq_key', self.uniq_key)
+
+    def set_command_entry(self):
+        data = {
+            'uniq_key': self.uniq_key,
+            'command': None,
+            'task_name': None,
+            'status_of_work': None
+        }
+        if self.collection_for_parser_commands.find_one({'uniq_key': self.uniq_key}) is None:
+            self.collection_for_parser_commands.insert_one(data)
+        else:
+            pass
+
+    def set_command_in_parser_commands(self, command: Union[str, None]):
+        self.add_data_in_entry(self.collection_for_parser_commands, 'command', command, 'uniq_key', self.uniq_key)
+
+    def set_task_name_in_parser_commands(self, task_name: str):
+        self.add_data_in_entry(self.collection_for_parser_commands, 'task_name', task_name, 'uniq_key', self.uniq_key)
+
+    def set_status_of_work_in_parser_commands(self, status: Union[str, None]):
+        self.add_data_in_entry(self.collection_for_parser_commands, 'status_of_work', status, 'uniq_key', self.uniq_key)
+
+    def get_data_from_entry_in_parser_commands(self, key: str):
+        entry = self.get_entry(self.collection_for_parser_commands, 'uniq_key', client_mongodb.uniq_key)
+        return entry[key]
 
 
 client_mongodb = MongoDBClient()

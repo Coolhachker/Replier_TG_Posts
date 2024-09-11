@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="MobileOptimized" content="176"/>
+    <meta name="HandheldFriendly" content="True"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <title>Channel Selection Form</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?1"></script>
+    <script src="https://webappcontent.telegram.org/js/jquery.min.js"></script>
+    <script type="text/javascript">
+        function 
+    </script>
+    <title>Centered Buttons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+        .button-container {
+            display: flex;
+            gap: 20px; /* Space between buttons */
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff; /* Bootstrap primary color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        button:active {
+            transform: translateY(0); /* Reset lift effect on click */
+        }
+    </style>
+</head>
+<body>
+<div class="button-container">
+    <button id="regular_link_from_channel" onclick="document.location='/channel/from'">Канала, откуда брать посты</button>
+    <button id="regular_link_to_channel" onclick="document.location='/channel/to'">Каналы, куда сбывать посты</button>
+</div>
+
+</body>
+</html>
