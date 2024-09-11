@@ -43,16 +43,29 @@ class MysqlDB:
             self.cursor.executemany("""INSERT INTO trusted_users(user_nickname, chat_id) VALUES(%s, %s)""", [('CHT_VENDETTA', None)])
         self.connection.commit()
 
+    def add_entry_in_trusted_users(self, user_nickname: str):
+        self.cursor.executemany("""INSERT INTO trusted_users(user_nickname, chat_id) VALUES(%s, %s)""", [(user_nickname, None)])
+        self.connection.commit()
+
     def get_chat_id_of_trusted_users(self) -> typing.List[str]:
         self.cursor.execute('SELECT chat_id FROM trusted_users')
         trusted_users = [user[0] for user in client_mysqldb.cursor.fetchall()]
         return trusted_users
+
+    def get_nicknames_of_trusted_user(self):
+        self.cursor.execute(f'SELECT user_nickname FROM trusted_users')
+        nickname = [user[0] for user in client_mysqldb.cursor.fetchall()]
+        return nickname
 
     @lru_cache(maxsize=128)
     def add_chat_id_in_trusted_users(self, nickname: str, chat_id) -> None:
         self.cursor.executemany("""UPDATE trusted_users SET chat_id = %s WHERE user_nickname = %s""", [(chat_id, nickname)])
         self.connection.commit()
         return None
+
+    def delete_admin_from_db(self, user_nickname: str):
+        self.cursor.execute(f"""DELETE FROM trusted_users WHERE user_nickname = '{user_nickname}' """)
+        self.connection.commit()
 
 
 client_mysqldb = MysqlDB()

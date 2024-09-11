@@ -12,8 +12,8 @@ def check_parser():
     count: int = 0
     while True:
         status = client_mongodb.get_data_from_entry_in_parser_commands('status_of_work')
-        if (re.search('не работает', status_of_parser) or status_of_parser == '') or (count == 10):
-            return status_of_parser if status_of_parser != '' else 'OK: Парсер не работает'
+        if (re.search('не работает', status_of_parser) or status_of_parser == '') or (count == 5):
+            return 'OK: Парсер не работает'
         if status is None:
             logger.debug(f'Состояние системы: {status}')
             time.sleep(1)

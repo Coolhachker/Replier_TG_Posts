@@ -11,6 +11,7 @@ def actions_markup() -> InlineKeyboardMarkup:
     add_or_delete_channels_button = InlineKeyboardButton(text='➕ Добавить или ➖ удалить каналы', callback_data=CallbacksNames.add_or_delete_channels)
     change_parameters_in_configs_button = InlineKeyboardButton(text='🔼 Изменить параметры в настройках', callback_data=CallbacksNames.change_parameters)
     channels_list_button = InlineKeyboardButton(text='🔰 Каналы', callback_data=CallbacksNames.get_channels)
+    admins_button = InlineKeyboardButton(text='Администраторы', callback_data=CallbacksNames.admins)
 
     keyboard.row(start_parser_button)
     keyboard.row(stop_parser_button)
@@ -18,6 +19,7 @@ def actions_markup() -> InlineKeyboardMarkup:
     keyboard.row(add_or_delete_channels_button)
     keyboard.row(change_parameters_in_configs_button)
     keyboard.row(channels_list_button)
+    keyboard.row(admins_button)
 
     return keyboard.as_markup()
 

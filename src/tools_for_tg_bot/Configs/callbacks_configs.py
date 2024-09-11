@@ -13,3 +13,7 @@ class CallbacksNames:
     get_channels: str = 'get_channels'
     turn_on_channel: str = 'turn_on_channel'
     turn_off_channel: str = 'turn_off_channel'
+    admins: str = 'admins'
+    add_admin: str = 'add_admin'
+    delete_admin: str = 'delete_admin'
+    list_of_admins: str = 'list_of_admins'

@@ -2,6 +2,7 @@ import asyncio
 from src.tools_for_tg_bot.handlers.commands import commands
 from src.tools_for_tg_bot.handlers.text import text
 from src.tools_for_tg_bot.handlers.callbacks import callbacks
+from src.tools_for_tg_bot.handlers.states import state_handlers
 from aiogram import Bot, Dispatcher
 from src.tools_for_tg_bot.middlewares.middleware_on_check_trusted_users import MiddlewareOnTrustUser
 from src.tools_for_tg_bot.middlewares.middleware_on_callback_requests import MiddlewareOnCallback
@@ -21,6 +22,7 @@ class BotForReplies:
         commands(self.dispatcher, self.bot)
         text(self.dispatcher, self.bot)
         callbacks(self.dispatcher, self.bot)
+        state_handlers(self.bot, self.dispatcher)
 
     async def start_pooling(self):
         asyncio.create_task(ping_the_parser(self.bot))
