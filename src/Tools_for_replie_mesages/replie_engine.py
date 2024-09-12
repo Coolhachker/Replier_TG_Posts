@@ -95,7 +95,7 @@ class ReplierEngine:
         await self.client_session.send_message(channel_to_post, **data_for_post)
         logger.info('Успешная отправка сообщения')
 
-    async def get_post_from_channel(self, channel_from_to_get_post: str, offset_date: Union[datetime, None] = None, reverse: bool = False, message_offset_id: int = 0):
+    async def get_post_from_channel(self, channel_from_to_get_post: str, offset_date: Union[datetime.datetime, None] = None, reverse: bool = False, message_offset_id: int = 0):
         """
         Метод нужен, чтобы получить один пост с канала
         :param channel_from_to_get_post: канал откуда брать посты
