@@ -16,6 +16,7 @@ from src.rabbitmq_tools.producer_commands import Commands
 from asyncio import Semaphore
 from src.Tools_for_replie_mesages.check_parser import command_check_parser
 from functools import lru_cache
+import datetime
 logger = logging.getLogger()
 
 
@@ -208,7 +209,7 @@ class ReplierEngine:
             logger.debug(data_for_send_in_channels)
             await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)
             logger.debug(f'Ушел спать {task_name}')
-            await asyncio.sleep(periodicity)
+            await asyncio.sleep(periodicity+return_a_total_time_for_sleep())
         except Exceptions.ExceptionOnUnsuitablePost as _ex:
             logger.error('Поймал некритичную ошибку: ', exc_info=_ex)
         except Exceptions.ExceptionOnDateOfPost as _ex:
@@ -226,6 +227,21 @@ def callback_of_work_task(task: asyncio.Task):
 @lru_cache
 def return_the_semaphores(channel_to: str) -> Semaphore:
     return Semaphore(1)
+
+
+def return_a_total_time_for_sleep() -> int:
+    #Получаем время для сна
+    # total_time = x - hour
+    x = datetime.datetime.today().hour
+    y = datetime.datetime.today().minute
+    if x < 9:
+        hour = (540 - (x * 60 + y)) * 60
+        return hour
+    elif x >= 21 and y >= 30:
+        hour = ((x * 60 + y) - 540) * 60
+        return hour
+    else:
+        return 0
 
 
 replier_engine = ReplierEngine(19567654, '7ec7d44a4889e041dd667dc760b323e1')
