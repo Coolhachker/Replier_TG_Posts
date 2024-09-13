@@ -56,7 +56,6 @@ services:
         ipv4_address: 172.16.235.2
     environment:
       MYSQL_ROOT_PASSWORD: root1234567890
-      MYSQL_HOST: bot_of_vk_activity-mysql_bd-1
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       start_period: 30s

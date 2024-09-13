@@ -208,7 +208,7 @@ class ReplierEngine:
             logger.debug(data_for_send_in_channels)
             await self.send_post_in_channel(channel_to_post, data_for_send_in_channels)
             logger.debug(f'Ушел спать {task_name}')
-            await asyncio.sleep(periodicity+return_a_total_time_for_sleep())
+            await asyncio.sleep(int(periodicity)+return_a_total_time_for_sleep())
         except Exceptions.ExceptionOnUnsuitablePost as _ex:
             logger.error('Поймал некритичную ошибку: ', exc_info=_ex)
         except Exceptions.ExceptionOnDateOfPost as _ex:
