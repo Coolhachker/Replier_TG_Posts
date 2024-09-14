@@ -67,6 +67,10 @@ class MysqlDB:
         self.cursor.execute(f"""DELETE FROM trusted_users WHERE user_nickname = '{user_nickname}' """)
         self.connection.commit()
 
+    def reconnect(self):
+        self.connection, self.cursor = self.connect_to_db()
+        self.create_table()
+
 
 client_mysqldb = MysqlDB()
 
