@@ -1,46 +1,96 @@
 [DEBUG] - __init__ - Using selector: EpollSelector
 [DEBUG] - __init__ - Using selector: EpollSelector
-[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7f96f47e12e0>>)
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
 [DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
-[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
 [DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
 [DEBUG] - remove_writer - remove_writer(9) updated handler Rd
-[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7f96f41ed460> with deadline=430.586819315 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7f96f41e0f00>>; now=370.586819315; delay=60
-[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7f96f41ed460> with deadline=430.586819315 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7f96f41e0f00>>
-[INFO] - log - 172.19.0.1 [11/Sep/2024:08:55:07 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
-[INFO] - feed_update - Update id=358109988 is handled. Duration 297 ms by bot id=6356385807
-[INFO] - log - 172.19.0.1 [11/Sep/2024:08:55:22 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
-[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7f96f47e12e0>>)
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74828b4c0> with deadline=112.03394663 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff7482dd1c0>>; now=52.03394663; delay=60
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74828b4c0> with deadline=112.03394663 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff7482dd1c0>>
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:54:54 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[INFO] - feed_update - Update id=358110191 is handled. Duration 247 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:54:56 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
 [DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
-[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
 [DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
 [DEBUG] - remove_writer - remove_writer(9) updated handler Rd
-[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74828bd00> with deadline=125.1876516 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff7480aea80>>; now=65.1876516; delay=60
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74828bd00> with deadline=125.1876516 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff7480aea80>>
+[INFO] - feed_update - Update id=358110192 is handled. Duration 228 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:54:57 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[INFO] - feed_update - Update id=358110193 is handled. Duration 132 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:54:58 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
+[DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
+[DEBUG] - remove_writer - remove_writer(9) updated handler Rd
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824b5e0> with deadline=127.646801555 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748252dc0>>; now=67.646801555; delay=60
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824b5e0> with deadline=127.646801555 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748252dc0>>
+[INFO] - feed_update - Update id=358110194 is handled. Duration 5238 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:55:05 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[INFO] - feed_update - Update id=358110195 is handled. Duration 104 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:55:07 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
+[DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
+[DEBUG] - remove_writer - remove_writer(9) updated handler Rd
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824b700> with deadline=136.003174282 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748104800>>; now=76.003174282; delay=60
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824b700> with deadline=136.003174282 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748104800>>
+[INFO] - feed_update - Update id=358110196 is handled. Duration 1406 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:55:10 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[INFO] - feed_update - Update id=358110197 is handled. Duration 163 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:55:11 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
+[DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
+[DEBUG] - remove_writer - remove_writer(9) updated handler Rd
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824b790> with deadline=140.758311124 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff7480f1980>>; now=80.758311124; delay=60
 [DEBUG] - received - Received heartbeat frame
-[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
 [DEBUG] - _send_heartbeat - Sending heartbeat frame
 [DEBUG] - _send_heartbeat_frame - Sending heartbeat frame
-[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7f96f47e12e0>>)
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
 [DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
-[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7f96f47e1190> with deadline=430.747630072 and callback=<bound method HeartbeatChecker._send_heartbeat of <pika.heartbeat.HeartbeatChecker object at 0x7f96f47e1490>>; now=400.747630072; delay=30.0
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824bb50> with deadline=111.519316198 and callback=<bound method HeartbeatChecker._send_heartbeat of <pika.heartbeat.HeartbeatChecker object at 0x7ff7490834f0>>; now=81.519316198; delay=30.0
 [DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
 [DEBUG] - remove_writer - remove_writer(9) updated handler Rd
-[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7f96f47e1520> with deadline=460.76086736 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7f96f41b6b00>>; now=400.76086736; delay=60
-[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7f96f47e1520> with deadline=460.76086736 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7f96f41b6b00>>
-[INFO] - feed_update - Update id=358109989 is handled. Duration 529 ms by bot id=6356385807
-[INFO] - log - 172.19.0.1 [11/Sep/2024:08:55:30 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
-[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7f96f47e12e0>>)
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824b790> with deadline=140.758311124 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff7480f1980>>
+[INFO] - feed_update - Update id=358110198 is handled. Duration 1247 ms by bot id=6356385807
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
 [DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
-[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
 [DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
 [DEBUG] - remove_writer - remove_writer(9) updated handler Rd
-[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7f96f41edeb0> with deadline=468.577015597 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7f96f405b700>>; now=408.577015597; delay=60
-[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 45620), raddr=('172.16.235.7', 5672)>
-[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7f96f41edeb0> with deadline=468.577015597 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7f96f405b700>>
-[INFO] - feed_update - Update id=358109990 is handled. Duration 708 ms by bot id=6356385807
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74828be80> with deadline=142.050213188 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748252980>>; now=82.050213188; delay=60
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74828be80> with deadline=142.050213188 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748252980>>
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:55:13 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[INFO] - feed_update - Update id=358110199 is handled. Duration 106 ms by bot id=6356385807
+[INFO] - log - 172.19.0.1 [13/Sep/2024:05:55:14 +0000] "POST /webhook HTTP/1.1" 200 159 "-" "-"
+[DEBUG] - set_writer - SelectorIOServicesAdapter.set_writer(9, <bound method _AsyncPlaintextTransport._on_socket_writable of <pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x7ff749083070>>)
+[DEBUG] - set_writer - set_writer(9, _) updated handler RdWr
+[DEBUG] - write - Turned on writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_writer - SelectorIOServicesAdapter.remove_writer(9)
+[DEBUG] - remove_writer - remove_writer(9) updated handler Rd
+[DEBUG] - _on_socket_writable - Turned off writability watcher: <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - call_later - call_later: added timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824bee0> with deadline=144.029262529 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748255500>>; now=84.029262529; delay=60
+[DEBUG] - _on_socket_readable - Recv would block on <socket.socket fd=9, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('172.16.235.5', 33996), raddr=('172.16.235.7', 5672)>
+[DEBUG] - remove_timeout - remove_timeout: removing timeout <pika.adapters.select_connection._Timeout object at 0x7ff74824bee0> with deadline=144.029262529 and callback=<bound method _CallbackResult.signal_once of <pika.adapters.blocking_connection._CallbackResult object at 0x7ff748255500>>
+[INFO] - feed_update - Update id=358110200 is handled. Duration 630 ms by bot id=6356385807

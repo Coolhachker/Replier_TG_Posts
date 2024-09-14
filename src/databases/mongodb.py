@@ -32,8 +32,8 @@ from src.tools_for_tg_bot.Configs.hosts import Hosts
 
 class MongoDBClient:
     def __init__(self):
-        connection_string = f'mongodb://{Hosts.mongodb}:27017/'
-        self.client = MongoClient(connection_string)
+        self.connection_string = f'mongodb://{Hosts.mongodb}:27017/'
+        self.client = MongoClient(self.connection_string)
         self.uniq_key = 1234567890
         self.collection_for_parser_configs = self.client['replies_config_collection']['collection_for_parser_configs']
         self.collection_for_bot_configs = self.client['replies_config_collection']['collection_for_bot_configs']
@@ -161,6 +161,9 @@ class MongoDBClient:
     def get_data_from_entry_in_parser_commands(self, key: str):
         entry = self.get_entry(self.collection_for_parser_commands, 'uniq_key', client_mongodb.uniq_key)
         return entry[key]
+
+    def reconnect(self):
+        self.client = MongoClient(self.connection_string)
 
 
 client_mongodb = MongoDBClient()
